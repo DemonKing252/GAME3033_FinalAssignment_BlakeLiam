@@ -27,16 +27,39 @@ public class PlayerController : MonoBehaviour
 
     private float currentAngle = 0f;
     private float turnSmoothVelocity;
+    private bool isAiming = false;
+
+    [SerializeField] private Transform targetTransform;
+    [SerializeField] private Transform aimTransform;
+    [SerializeField] private Transform boneTransform;
+    [SerializeField] private Transform drawGizmoTransform;
+
+    [SerializeField] private Cinemachine.CinemachineFreeLook aimCamera;
+
+    private Quaternion originalRotation;
 
     // Start is called before the first frame update
     void Start()
     {
+        originalRotation = boneTransform.rotation;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetMouseButton(1))
+        {
+            aimCamera.Priority = 3;
+            isAiming = true;
+        }
+        else
+        {
+            aimCamera.Priority = 1;
+            isAiming = false;
+        }
+
+
         float horiz = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
@@ -60,5 +83,26 @@ public class PlayerController : MonoBehaviour
 
         //transform.rotation = Quaternion.Euler(mouseX * mouseSensitivity * Time.deltaTime, mouseY * mouseSensitivity * Time.deltaTime, 0f);
 
+    }
+    void LateUpdate()
+    {
+        if (isAiming)
+            UpdateAim();
+    }
+
+    public void UpdateAim()
+    {
+        transform.rotation = Quaternion.Euler(new Vector3(0f, camTransform.rotation.eulerAngles.y, 0f));
+
+        Vector3 aimDir = aimTransform.forward;
+        Vector3 targetDir = aimTransform.position - camTransform.position;
+        Quaternion aimTowards = Quaternion.FromToRotation(aimDir, targetDir);
+        
+        boneTransform.rotation = aimTowards * originalRotation * transform.rotation;
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(drawGizmoTransform.position, drawGizmoTransform.position + drawGizmoTransform.forward * 3f);
     }
 }
