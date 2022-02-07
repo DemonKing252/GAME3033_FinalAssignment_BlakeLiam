@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public delegate void OnAimingStateChanged(bool moving);
+    public event OnAimingStateChanged onMovementStateChanged;
+
+
     [SerializeField]
     private float playerSpeed = 10f;
 
@@ -47,6 +51,9 @@ public class PlayerController : MonoBehaviour
 
     private Quaternion originalRotation;
 
+    [SerializeField] private Transform rightHandTransform;
+
+    private bool alreadyDid = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -55,6 +62,9 @@ public class PlayerController : MonoBehaviour
 
         originalRotation = boneTransform.rotation;
         Cursor.lockState = CursorLockMode.Locked;
+
+        //onMovementStateChanged.Invoke(false);
+
     }
 
     // Update is called once per frame
@@ -81,7 +91,6 @@ public class PlayerController : MonoBehaviour
             lookAtTransform.position = lookAtAiming.position;
         }
 
-        //lookAtTransform.position = Vector3.Lerp(lookAtTransform.position, targetPosition, Time.deltaTime * aimInterpSpeed);
 
         float horiz = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
@@ -89,24 +98,38 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = new Vector3(horiz, 0f, vertical).normalized;
         movement *= playerSpeed * Time.deltaTime;
 
-
         if (movement.magnitude > 0.0f)
         {
 
+            
+
             float targetAngle = Mathf.Atan2(movement.x, movement.z) * Mathf.Rad2Deg + camTransform.eulerAngles.y;
             currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref turnSmoothVelocity, Time.deltaTime * turnSpeed);
-            transform.rotation = Quaternion.Euler(0f, currentAngle, 0f);
-
+            if (!isAiming)
+            {
+                transform.rotation = Quaternion.Euler(0f, currentAngle, 0f);
+            }
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             characterController.Move(moveDir * playerSpeed * Time.deltaTime);
+            
+            onMovementStateChanged.Invoke(true);
         }
-
+        else
+        {
+            onMovementStateChanged.Invoke(false);
+        }
         Vector2 lateralSpeed = (new Vector2(horiz, vertical).normalized);
         anim.SetFloat("Blend", lateralSpeed.magnitude);
 
         //transform.rotation = Quaternion.Euler(mouseX * mouseSensitivity * Time.deltaTime, mouseY * mouseSensitivity * Time.deltaTime, 0f);
 
     }
+    public void SetGripTransform(Transform trans)
+    {
+        rightHandTransform = trans;
+    }
+
+
     void LateUpdate()
     {
         if (isAiming)
@@ -115,21 +138,38 @@ public class PlayerController : MonoBehaviour
 
     public void UpdateAim()
     {
-        transform.rotation = Quaternion.Euler(new Vector3(0f, camTransform.rotation.eulerAngles.y, 0f));
+        Quaternion targetRot = Quaternion.Euler(new Vector3(0f, camTransform.rotation.eulerAngles.y, 0f));
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * 12f);
 
+        //transform.rotation = Quaternion.Euler(new Vector3(0f, camTransform.rotation.eulerAngles.y, 0f));
 
-        //boneTransform.LookAt(aimTransform.position);
-        
-        
-        Vector3 aimDir = aimTransform.forward;
+        //Vector3 aimDir = aimTransform.forward;
         Vector3 targetDir = aimTransform.position - camTransform.position;
-        Quaternion aimTowards = Quaternion.FromToRotation(aimDir, targetDir);
         
-        boneTransform.rotation = Quaternion.Euler(baseRotation) * (aimTowards * originalRotation * transform.rotation);
+        //Quaternion aimTowards = Quaternion.FromToRotation(aimDir, targetDir);
+        Quaternion aimTowards = Quaternion.LookRotation(targetDir);
+        
+        //Quaternion targetBoneRotation = aimTowards;
+        Quaternion targetBoneRotation = Quaternion.Euler(baseRotation) * aimTowards * originalRotation;
+
+        boneTransform.rotation = Quaternion.Euler(baseRotation)*aimTowards*originalRotation;
     }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(drawGizmoTransform.position, drawGizmoTransform.position + drawGizmoTransform.forward * 3f);
+        Gizmos.DrawLine(camTransform.position, aimTransform.position);
+        //Gizmos.DrawLine(drawGizmoTransform.position, drawGizmoTransform.position + drawGizmoTransform.forward * 3f);
     }
+
+    private void OnAnimatorIK(int layerIndex)
+    {
+        // TODO: Reloading we want to ignore this
+        {
+            anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+            anim.SetIKPosition(AvatarIKGoal.LeftHand, rightHandTransform.position);
+
+        }
+        
+    }
+
 }
