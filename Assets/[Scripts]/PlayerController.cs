@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
     private float mouseSensitivity = 5f;
 
     [SerializeField]
+    private Vector3 baseRotation;
+
+    [SerializeField]
     private float turnSpeed = 3f;
     
     [SerializeField]
@@ -34,6 +37,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform boneTransform;
     [SerializeField] private Transform drawGizmoTransform;
 
+    private Vector3 targetPosition;
+    [SerializeField] private float aimInterpSpeed = 5f;
+    [SerializeField] private Transform lookAtTransform;
+    [SerializeField] private Transform lookAtIdle;
+    [SerializeField] private Transform lookAtAiming;
+
     [SerializeField] private Cinemachine.CinemachineFreeLook aimCamera;
 
     private Quaternion originalRotation;
@@ -41,6 +50,9 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        targetPosition = lookAtTransform.position;
+        lookAtTransform.position = lookAtAiming.position;
+
         originalRotation = boneTransform.rotation;
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -48,17 +60,28 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButtonDown(1))
         {
             aimCamera.Priority = 3;
+            anim.SetBool("IsAiming", true);
             isAiming = true;
+
+            targetPosition = lookAtIdle.position;
+
+            lookAtTransform.position = lookAtIdle.position;
         }
-        else
+        else if (Input.GetMouseButtonUp(1))
         {
             aimCamera.Priority = 1;
+            anim.SetBool("IsAiming", false);
             isAiming = false;
+            
+            targetPosition = lookAtAiming.position;
+            
+            lookAtTransform.position = lookAtAiming.position;
         }
 
+        //lookAtTransform.position = Vector3.Lerp(lookAtTransform.position, targetPosition, Time.deltaTime * aimInterpSpeed);
 
         float horiz = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
@@ -94,11 +117,15 @@ public class PlayerController : MonoBehaviour
     {
         transform.rotation = Quaternion.Euler(new Vector3(0f, camTransform.rotation.eulerAngles.y, 0f));
 
+
+        //boneTransform.LookAt(aimTransform.position);
+        
+        
         Vector3 aimDir = aimTransform.forward;
         Vector3 targetDir = aimTransform.position - camTransform.position;
         Quaternion aimTowards = Quaternion.FromToRotation(aimDir, targetDir);
         
-        boneTransform.rotation = aimTowards * originalRotation * transform.rotation;
+        boneTransform.rotation = Quaternion.Euler(baseRotation) * (aimTowards * originalRotation * transform.rotation);
     }
     private void OnDrawGizmos()
     {
