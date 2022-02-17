@@ -2308,5 +2308,17 @@ PrefabInstance:
       propertyPath: ui
       value: 
       objectReference: {fileID: 264713020}
+    - target: {fileID: 3072885751935674762, guid: 5eac51f2522e4674bb396ecb6c3ddb8c, type: 3}
+      propertyPath: cam
+      value: 
+      objectReference: {fileID: 1833624140}
+    - target: {fileID: 3072885751935674762, guid: 5eac51f2522e4674bb396ecb6c3ddb8c, type: 3}
+      propertyPath: bulletPrefab
+      value: 
+      objectReference: {fileID: 3171950434465471471, guid: 0dfa89626e5b3e34e8e1ec4aa870b0bd, type: 3}
+    - target: {fileID: 3072885751935674762, guid: 5eac51f2522e4674bb396ecb6c3ddb8c, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5eac51f2522e4674bb396ecb6c3ddb8c, type: 3}
