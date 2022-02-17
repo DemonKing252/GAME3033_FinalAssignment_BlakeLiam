@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private float turnSpeed = 3f;
-    
+
     [SerializeField]
     private Animator anim;
 
@@ -53,7 +53,11 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Transform rightHandTransform;
 
-    private bool alreadyDid = false;
+    private Vector3 vel = Vector3.zero;
+
+    public float grav = 0f;
+    public float jumpForce = 0f;
+    private bool isGrounded = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -85,9 +89,9 @@ public class PlayerController : MonoBehaviour
             aimCamera.Priority = 1;
             anim.SetBool("IsAiming", false);
             isAiming = false;
-            
+
             targetPosition = lookAtAiming.position;
-            
+
             lookAtTransform.position = lookAtAiming.position;
         }
 
@@ -98,11 +102,10 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = new Vector3(horiz, 0f, vertical).normalized;
         movement *= playerSpeed * Time.deltaTime;
 
+
+
         if (movement.magnitude > 0.0f)
         {
-
-            
-
             float targetAngle = Mathf.Atan2(movement.x, movement.z) * Mathf.Rad2Deg + camTransform.eulerAngles.y;
             currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref turnSmoothVelocity, Time.deltaTime * turnSpeed);
             if (!isAiming)
@@ -110,20 +113,46 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0f, currentAngle, 0f);
             }
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+
             characterController.Move(moveDir * playerSpeed * Time.deltaTime);
-            
+
             onMovementStateChanged.Invoke(true);
         }
         else
         {
             onMovementStateChanged.Invoke(false);
         }
+
+        if (Input.GetKeyDown(KeyCode.Space) /*&& isGrounded*/)
+        {
+            vel.y = jumpForce;
+            anim.SetBool("IsJumping", true);
+            isGrounded = false;
+        }
+        vel.y += grav * Time.deltaTime;
+
+        characterController.Move(new Vector3(0f, vel.y * Time.deltaTime, 0f));
+
+
+
         Vector2 lateralSpeed = (new Vector2(horiz, vertical).normalized);
         anim.SetFloat("Blend", lateralSpeed.magnitude);
 
         //transform.rotation = Quaternion.Euler(mouseX * mouseSensitivity * Time.deltaTime, mouseY * mouseSensitivity * Time.deltaTime, 0f);
 
     }
+
+    private void OnTriggerEnter(Collider other)
+    { 
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+            Debug.Log("Collision enter with the ground.");
+            anim.SetBool("IsJumping", false);
+        }
+    }
+
+
     public void SetGripTransform(Transform trans)
     {
         rightHandTransform = trans;
