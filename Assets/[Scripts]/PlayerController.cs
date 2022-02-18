@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public delegate void OnAimingStateChanged(bool moving);
-    public event OnAimingStateChanged onMovementStateChanged;
+    public delegate void OnMovementStateChanged(bool moving);
+    public event OnMovementStateChanged onMovementStateChanged;
+
+    public delegate void OnAimingStateChanged(bool aiming);
+    public event OnAimingStateChanged onAimStateChanged;
 
 
     [SerializeField]
@@ -27,7 +30,7 @@ public class PlayerController : MonoBehaviour
     private float turnSpeed = 3f;
 
     [SerializeField]
-    private Animator anim;
+    public Animator anim;
 
     [SerializeField]
     private Transform camTransform;
@@ -58,6 +61,7 @@ public class PlayerController : MonoBehaviour
     public float grav = 0f;
     public float jumpForce = 0f;
     private bool isGrounded = true;
+    public bool isReloading = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -68,7 +72,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         //onMovementStateChanged.Invoke(false);
-
+        onAimStateChanged.Invoke(false);
     }
 
     // Update is called once per frame
@@ -79,6 +83,7 @@ public class PlayerController : MonoBehaviour
             aimCamera.Priority = 3;
             anim.SetBool("IsAiming", true);
             isAiming = true;
+            onAimStateChanged.Invoke(true);
 
             targetPosition = lookAtIdle.position;
 
@@ -89,7 +94,7 @@ public class PlayerController : MonoBehaviour
             aimCamera.Priority = 1;
             anim.SetBool("IsAiming", false);
             isAiming = false;
-
+            onAimStateChanged.Invoke(false);
             targetPosition = lookAtAiming.position;
 
             lookAtTransform.position = lookAtAiming.position;
@@ -192,11 +197,11 @@ public class PlayerController : MonoBehaviour
 
     private void OnAnimatorIK(int layerIndex)
     {
-        // TODO: Reloading we want to ignore this
+        if (!isReloading)
         {
             anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
             anim.SetIKPosition(AvatarIKGoal.LeftHand, rightHandTransform.position);
-
+        
         }
         
     }
