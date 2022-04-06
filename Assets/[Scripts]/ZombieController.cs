@@ -7,19 +7,24 @@ public class ZombieController : MonoBehaviour
 {
     private NavMeshAgent agent;
     private Animator zombieAnimator;
+    private CapsuleCollider capsuleCollider;
     [SerializeField] private Transform playerTransform;
     [SerializeField] private float minDist;
     [SerializeField] private Transform fromTransform;
+    [SerializeField] private float startingHealth = 100f;
+    private float currentHealth;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         zombieAnimator = GetComponent<Animator>();
+        capsuleCollider = GetComponent<CapsuleCollider>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        currentHealth = startingHealth;
         //InvokeRepeating(nameof(SetDestination), 0f, 2f);
     }
 
@@ -27,7 +32,22 @@ public class ZombieController : MonoBehaviour
     {
         agent.SetDestination(playerTransform.position);
     }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Bullet"))
+        {
+            Debug.Log("bullet collision");
+            Destroy(collision.gameObject);
 
+            currentHealth -= 10f;
+            if (currentHealth <= 0f)
+            {
+                capsuleCollider.enabled = false;
+                agent.isStopped = true;
+                zombieAnimator.SetTrigger("Death");
+            }
+        }
+    }
     // Update is called once per frame
     void Update()
     {

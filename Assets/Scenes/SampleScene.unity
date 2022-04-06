@@ -2619,6 +2619,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Zombie
       objectReference: {fileID: 0}
+    - target: {fileID: 1580485951152849300, guid: 72cee4b659fe064459aabcc90877d2b4, type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1580485951152849300, guid: 72cee4b659fe064459aabcc90877d2b4, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1906054274660256794, guid: 72cee4b659fe064459aabcc90877d2b4, type: 3}
       propertyPath: playerTransform
       value: 
