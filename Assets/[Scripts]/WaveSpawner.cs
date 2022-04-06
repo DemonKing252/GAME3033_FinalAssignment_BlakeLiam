@@ -9,7 +9,6 @@ public class Wave
 {
     public int numZombies;
     public float agentSpeed = 0.6f;
-    public Collider[] spawnColliders;
     public float delayBetweenSpawns = 3f;
 
 }
@@ -17,8 +16,19 @@ public class Wave
 public class ZombieHorde
 {
     public Wave[] waves;
+    public Collider[] spawnColliders;
     public float delayToNextWave;
 
+    // Choose a random spawner, and get a random point in it:
+    public Vector3 GetRandomPointInSpawners()
+    {
+        int randIdx = Random.Range(0, spawnColliders.Length);
+        Vector3 min = new Vector3(spawnColliders[randIdx].bounds.min.x, spawnColliders[randIdx].bounds.min.y, spawnColliders[randIdx].bounds.min.z);
+        Vector3 max = new Vector3(spawnColliders[randIdx].bounds.max.x, spawnColliders[randIdx].bounds.max.y, spawnColliders[randIdx].bounds.max.z);
+
+        Vector3 point = new Vector3(Random.Range(min.x, max.x), spawnColliders[randIdx].transform.position.y, Random.Range(min.z, max.z));
+        return point;
+    }
 }
 
 
@@ -62,7 +72,7 @@ public class WaveSpawner : MonoBehaviour
             int zombiesRemaining = horde.waves[waveIndex].numZombies;
             do
             {
-                ZombieController zController = Instantiate(zombiePrefab, spawnTransform.position, Quaternion.identity);
+                ZombieController zController = Instantiate(zombiePrefab, horde.GetRandomPointInSpawners(), Quaternion.identity);
                 zController.Seek(playerTransform);
                 zombiesInScene.Add(zController);
 
@@ -79,7 +89,8 @@ public class WaveSpawner : MonoBehaviour
             yield return new WaitForSeconds(horde.delayToNextWave);
 
             waveIndex++;
-            currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
+            if (waveIndex <= horde.waves.Length - 1)
+                currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
 
         } while (waveIndex < horde.waves.Length);
     }

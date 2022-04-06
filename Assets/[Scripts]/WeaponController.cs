@@ -3,6 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
+[System.Serializable]
+public class Weapon
+{
+    public string name = "AK47";
+    public bool loopFire;
+    public float fireRate = 0.2f;
+    public int ammoCount = 30;
+    public int ammoTotal = 90;
+    public int startingMagSize = 30;
+}
+
+
 public class WeaponController : MonoBehaviour
 {
     [SerializeField] private GameObject ak47Prefab;
@@ -20,23 +33,15 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Image ui;
     [SerializeField] private Camera cam;
     [SerializeField] private LayerMask groundLayer;
+    public TMP_Text ammoText;
+
     private bool canFireWeapon = false;
 
+    [SerializeField] private Weapon equippedWeapon;
 
     // This will eventually move to a Weapon script on the prefab once we have multiple weapons.
-    [Header("Weapon Properties")]
-    [SerializeField] private bool loopFire;
-    [SerializeField] private int startingAmmo;
-    [SerializeField] private int startingMagSize = 30;
-    [SerializeField] private float fireRate = 0.2f;
+   
 
-    [SerializeField] private TMP_Text ammoText;
-
-
-    private int currentMagSize = 30;
-    private int currentAmmo = 300;
-
-    
 
     // Start is called before the first frame update
     void Start()
@@ -54,10 +59,8 @@ public class WeaponController : MonoBehaviour
         pController.onMovementStateChanged += OnMovementStateChanged;
         pController.onAimStateChanged += OnAimStateChanged;
 
-        currentMagSize = startingMagSize;
-        currentAmmo = startingAmmo;
 
-        ammoText.text = currentMagSize.ToString() + " / " + currentAmmo.ToString();
+        ammoText.text = equippedWeapon.ammoCount.ToString() + " / " + equippedWeapon.ammoTotal.ToString();
     }
 
     private void OnDestroy()
@@ -120,19 +123,19 @@ public class WeaponController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && canFireWeapon)
         {
-            if (loopFire && currentMagSize > 0)
+            if (equippedWeapon.loopFire && equippedWeapon.ammoCount > 0)
             {
-                InvokeRepeating("InvokeFire", 0f, fireRate);
+                InvokeRepeating(nameof(InvokeFire), 0f, equippedWeapon.fireRate);
             }
             else
             {
-                if (currentMagSize > 0)
+                if (equippedWeapon.ammoCount > 0)
                     OnFire();
             }
         }
         if (Input.GetMouseButtonUp(0))
         {
-            CancelInvoke("InvokeFire");
+            CancelInvoke(nameof(InvokeFire));
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -144,18 +147,19 @@ public class WeaponController : MonoBehaviour
 
         pController.anim.SetTrigger("IsReloading");
 
-        int bulletsToReload = startingMagSize - currentAmmo;
-        if (bulletsToReload < 0)
+        int ammoDifference = equippedWeapon.startingMagSize - equippedWeapon.ammoCount;
+        if (equippedWeapon.ammoTotal > ammoDifference)
         {
-            currentAmmo -= (startingMagSize - currentMagSize);
-            currentMagSize = startingMagSize;
+            equippedWeapon.ammoCount += ammoDifference;
+            equippedWeapon.ammoTotal -= ammoDifference;
         }
         else
         {
-            currentMagSize = startingAmmo;
-            currentAmmo = 0;
+            equippedWeapon.ammoCount += equippedWeapon.ammoTotal;
+            equippedWeapon.ammoTotal = 0;
         }
-        ammoText.text = currentMagSize.ToString() + " / " + currentAmmo.ToString();
+
+        ammoText.text = equippedWeapon.ammoCount.ToString() + " / " + equippedWeapon.ammoTotal.ToString();
 
         pController.isReloading = true;
 
@@ -166,15 +170,15 @@ public class WeaponController : MonoBehaviour
 
     public void InvokeFire()
     {
-        if (currentMagSize <= 0)
-            CancelInvoke("InvokeFire");
-
-        OnFire();
+        if (equippedWeapon.ammoCount <= 0)
+            CancelInvoke(nameof(InvokeFire));
+        else
+            OnFire();
     }
     public void OnFire()
     {
-        currentMagSize--;
-        ammoText.text = currentMagSize.ToString() + " / " + currentAmmo.ToString();
+        equippedWeapon.ammoCount--;
+        ammoText.text = equippedWeapon.ammoCount.ToString() + " / " + equippedWeapon.ammoTotal.ToString();
 
         GameObject bullet = Instantiate(bulletPrefab);
         pController.anim.SetTrigger("IsFiring");

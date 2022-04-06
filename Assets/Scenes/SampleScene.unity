@@ -129,7 +129,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-43880
+  m_Name: pb_Mesh16948
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -293,7 +293,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-32238
+  m_Name: pb_Mesh16780
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -628,7 +628,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-42822
+  m_Name: pb_Mesh16870
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1417,7 +1417,7 @@ GameObject:
   - component: {fileID: 440467623}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 8
@@ -22578,6 +22578,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!65 &740403629 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 740403629, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+  m_PrefabInstance: {fileID: 8329780695297074684}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &830424356
 GameObject:
   m_ObjectHideFlags: 0
@@ -22712,6 +22717,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 830424356}
   m_CullTransparentMesh: 1
+--- !u!65 &858456784 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 858456784, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+  m_PrefabInstance: {fileID: 8329780695297074684}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &861108197
 GameObject:
   m_ObjectHideFlags: 3
@@ -23072,7 +23082,7 @@ GameObject:
   - component: {fileID: 1010819092}
   m_Layer: 0
   m_Name: Stairs
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 8
@@ -28742,7 +28752,7 @@ GameObject:
   - component: {fileID: 1555032398}
   m_Layer: 0
   m_Name: Stairs (1)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 8
@@ -33763,6 +33773,11 @@ Transform:
   m_Father: {fileID: 1530292619}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1749125915 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 1749125915, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+  m_PrefabInstance: {fileID: 8329780695297074684}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1833624138
 GameObject:
   m_ObjectHideFlags: 0
@@ -34727,6 +34742,18 @@ PrefabInstance:
       propertyPath: ammoText
       value: 
       objectReference: {fileID: 1339140350}
+    - target: {fileID: 3072885751935674762, guid: 5eac51f2522e4674bb396ecb6c3ddb8c, type: 3}
+      propertyPath: fireRate
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3072885751935674762, guid: 5eac51f2522e4674bb396ecb6c3ddb8c, type: 3}
+      propertyPath: equippedWeapon.fireRate
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3072885751935674762, guid: 5eac51f2522e4674bb396ecb6c3ddb8c, type: 3}
+      propertyPath: equippedWeapon.loopFire
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5eac51f2522e4674bb396ecb6c3ddb8c, type: 3}
 --- !u!1001 &8329780695297074684
@@ -34736,6 +34763,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 740403627, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: m_Name
+      value: ZombieSpawn3
+      objectReference: {fileID: 0}
+    - target: {fileID: 858456782, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: m_Name
+      value: ZombieSpawn2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749125913, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: m_Name
+      value: ZombieSpawn1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5038512525591067615, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: m_Name
+      value: ZombieSpawn4
+      objectReference: {fileID: 0}
     - target: {fileID: 8329780694737966144, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
       propertyPath: spawnTransform
       value: 
@@ -34752,21 +34795,41 @@ PrefabInstance:
       propertyPath: zombiesLeftText
       value: 
       objectReference: {fileID: 1875878469}
+    - target: {fileID: 8329780694737966144, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: horde.spawnColliders.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8329780694737966144, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: horde.spawnColliders.Array.data[0]
+      value: 
+      objectReference: {fileID: 1749125915}
+    - target: {fileID: 8329780694737966144, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: horde.spawnColliders.Array.data[1]
+      value: 
+      objectReference: {fileID: 858456784}
+    - target: {fileID: 8329780694737966144, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: horde.spawnColliders.Array.data[2]
+      value: 
+      objectReference: {fileID: 740403629}
+    - target: {fileID: 8329780694737966144, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+      propertyPath: horde.spawnColliders.Array.data[3]
+      value: 
+      objectReference: {fileID: 8329780695297074685}
     - target: {fileID: 8329780694737966145, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
       propertyPath: m_RootOrder
       value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 8329780694737966145, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.4535823
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8329780694737966145, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -7.2486167
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8329780694737966145, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.2202606
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8329780694737966145, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
       propertyPath: m_LocalRotation.w
@@ -34802,3 +34865,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+--- !u!65 &8329780695297074685 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 1536024649243830257, guid: c91a6d74ee6c1c849b1af47fe84d7212, type: 3}
+  m_PrefabInstance: {fileID: 8329780695297074684}
+  m_PrefabAsset: {fileID: 0}

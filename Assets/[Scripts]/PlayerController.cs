@@ -76,17 +76,13 @@ public class PlayerController : MonoBehaviour
     {
         targetPosition = lookAtTransform.position;
         lookAtTransform.position = lookAtAiming.position;
-
         originalRotation = boneTransform.rotation;
         Cursor.lockState = CursorLockMode.Locked;
-
         onAimStateChanged.Invoke(false);
-
         RefreshUI();
     }
     private void RefreshUI()
     {
-
         Vector2 parentHealthDelta = healthBarParent.rectTransform.sizeDelta;
         healthBar.rectTransform.sizeDelta = new Vector2(health / 100f * parentHealthDelta.x, healthBar.rectTransform.sizeDelta.y);
 
@@ -119,14 +115,11 @@ public class PlayerController : MonoBehaviour
             lookAtTransform.position = lookAtAiming.position;
         }
 
-
         float horiz = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
         Vector3 movement = new Vector3(horiz, 0f, vertical).normalized;
         movement *= playerSpeed * Time.deltaTime;
-
-
 
         if (movement.magnitude > 0.0f)
         {
@@ -137,17 +130,14 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0f, currentAngle, 0f);
             }
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-
             characterController.Move(moveDir * playerSpeed * Time.deltaTime);
-
             onMovementStateChanged.Invoke(true);
         }
         else
         {
             onMovementStateChanged.Invoke(false);
         }
-
-        if (Input.GetKeyDown(KeyCode.Space) /*&& isGrounded*/)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             vel.y = jumpForce;
             anim.SetBool("IsJumping", true);
@@ -172,7 +162,6 @@ public class PlayerController : MonoBehaviour
         }
         if (other.gameObject.CompareTag("Arm"))
         {
-            Debug.Log("Zombie arm..");
             ZombieController zController = null;
             if ((zController = other.transform.GetComponentInParent<ZombieController>()) != null)
             {
