@@ -425,9 +425,14 @@ MonoBehaviour:
   lookAtIdle: {fileID: 1008971296}
   lookAtAiming: {fileID: 2010239546}
   aimCamera: {fileID: 0}
+  healthBarParent: {fileID: 0}
+  healthBar: {fileID: 0}
+  armourBarParent: {fileID: 0}
+  armourBar: {fileID: 0}
   rightHandTransform: {fileID: 8956429383548155264}
   grav: -9.81
   jumpForce: 4
+  isReloading: 0
 --- !u!143 &8826523238353597687
 CharacterController:
   m_ObjectHideFlags: 0
@@ -461,7 +466,19 @@ MonoBehaviour:
   ak47Prefab: {fileID: 592150697468473760, guid: ae4d67b20eab8ef499bbfdeebe1cb568, type: 3}
   armSocketTransform_Idle: {fileID: 3725714052017836244}
   armSocketTransform_Moving: {fileID: 2034258694}
+  bulletPrefab: {fileID: 3171950434465471471, guid: 0dfa89626e5b3e34e8e1ec4aa870b0bd, type: 3}
+  ak47MuzzleBack: {fileID: 0}
+  ak47MuzzleFront: {fileID: 0}
   ui: {fileID: 0}
+  cam: {fileID: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  loopFire: 1
+  startingAmmo: 120
+  startingMagSize: 30
+  fireRate: 0.1
+  ammoText: {fileID: 0}
 --- !u!65 &4017719400573382057
 BoxCollider:
   m_ObjectHideFlags: 0

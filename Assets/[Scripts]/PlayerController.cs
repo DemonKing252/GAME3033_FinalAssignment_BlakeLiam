@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -51,6 +52,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform lookAtAiming;
 
     [SerializeField] private Cinemachine.CinemachineFreeLook aimCamera;
+    [SerializeField] private RawImage healthBarParent;
+    [SerializeField] private Image healthBar;
+    [SerializeField] private RawImage armourBarParent;
+    [SerializeField] private Image armourBar;
 
     private Quaternion originalRotation;
 
@@ -62,6 +67,10 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 0f;
     private bool isGrounded = true;
     public bool isReloading = false;
+
+    private float health = 100f;
+    private float armour = 40f;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -71,8 +80,18 @@ public class PlayerController : MonoBehaviour
         originalRotation = boneTransform.rotation;
         Cursor.lockState = CursorLockMode.Locked;
 
-        //onMovementStateChanged.Invoke(false);
         onAimStateChanged.Invoke(false);
+
+        RefreshUI();
+    }
+    private void RefreshUI()
+    {
+
+        Vector2 parentHealthDelta = healthBarParent.rectTransform.sizeDelta;
+        healthBar.rectTransform.sizeDelta = new Vector2(health / 100f * parentHealthDelta.x, healthBar.rectTransform.sizeDelta.y);
+
+        Vector2 parentArmourDelta = healthBarParent.rectTransform.sizeDelta;
+        armourBar.rectTransform.sizeDelta = new Vector2(armour / 100f * parentArmourDelta.x, armourBar.rectTransform.sizeDelta.y);
     }
 
     // Update is called once per frame
@@ -138,12 +157,8 @@ public class PlayerController : MonoBehaviour
 
         characterController.Move(new Vector3(0f, vel.y * Time.deltaTime, 0f));
 
-
-
         Vector2 lateralSpeed = (new Vector2(horiz, vertical).normalized);
         anim.SetFloat("Blend", lateralSpeed.magnitude);
-
-        //transform.rotation = Quaternion.Euler(mouseX * mouseSensitivity * Time.deltaTime, mouseY * mouseSensitivity * Time.deltaTime, 0f);
 
     }
 
@@ -154,6 +169,22 @@ public class PlayerController : MonoBehaviour
             isGrounded = true;
             Debug.Log("Collision enter with the ground.");
             anim.SetBool("IsJumping", false);
+        }
+        if (other.gameObject.CompareTag("Arm"))
+        {
+            Debug.Log("Zombie arm..");
+            ZombieController zController = null;
+            if ((zController = other.transform.GetComponentInParent<ZombieController>()) != null)
+            {
+                if (zController.isAttacking)
+                {
+                    health -= 15f * (armour > 0f ? 0.25f : 1f);
+                    armour -= 15f;
+                    armour = Mathf.Max(armour, 0);
+
+                    RefreshUI();
+                }
+            }
         }
     }
 
@@ -174,16 +205,8 @@ public class PlayerController : MonoBehaviour
     {
         Quaternion targetRot = Quaternion.Euler(new Vector3(0f, camTransform.rotation.eulerAngles.y, 0f));
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * 12f);
-
-        //transform.rotation = Quaternion.Euler(new Vector3(0f, camTransform.rotation.eulerAngles.y, 0f));
-
-        //Vector3 aimDir = aimTransform.forward;
-        Vector3 targetDir = aimTransform.position - camTransform.position;
-        
-        //Quaternion aimTowards = Quaternion.FromToRotation(aimDir, targetDir);
-        Quaternion aimTowards = Quaternion.LookRotation(targetDir);
-        
-        //Quaternion targetBoneRotation = aimTowards;
+        Vector3 targetDir = aimTransform.position - camTransform.position;       
+        Quaternion aimTowards = Quaternion.LookRotation(targetDir);    
         Quaternion targetBoneRotation = Quaternion.Euler(baseRotation) * aimTowards * originalRotation;
 
         boneTransform.rotation = Quaternion.Euler(baseRotation)*aimTowards*originalRotation;
@@ -192,7 +215,6 @@ public class PlayerController : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(camTransform.position, aimTransform.position);
-        //Gizmos.DrawLine(drawGizmoTransform.position, drawGizmoTransform.position + drawGizmoTransform.forward * 3f);
     }
 
     private void OnAnimatorIK(int layerIndex)

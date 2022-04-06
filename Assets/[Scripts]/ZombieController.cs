@@ -14,6 +14,15 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private float startingHealth = 100f;
     private float currentHealth;
 
+    public int waveIndex = 0;
+    public WaveSpawner[] waveSpawners;
+    public bool isAttacking;
+
+    public void Seek(Transform transf)
+    {
+        playerTransform = transf;    
+    }
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -25,7 +34,7 @@ public class ZombieController : MonoBehaviour
     void Start()
     {
         currentHealth = startingHealth;
-        //InvokeRepeating(nameof(SetDestination), 0f, 2f);
+        waveSpawners = FindObjectsOfType<WaveSpawner>();
     }
 
     void FixedUpdate()
@@ -39,15 +48,22 @@ public class ZombieController : MonoBehaviour
             Debug.Log("bullet collision");
             Destroy(collision.gameObject);
 
-            currentHealth -= 10f;
+            currentHealth -= 30f;
             if (currentHealth <= 0f)
             {
                 capsuleCollider.enabled = false;
                 agent.isStopped = true;
                 zombieAnimator.SetTrigger("Death");
+
+                Destroy(gameObject, 5f);
             }
         }
     }
+    private void OnDestroy()
+    {
+        waveSpawners[waveIndex].OnZombieKilled(this);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -56,12 +72,25 @@ public class ZombieController : MonoBehaviour
         {
             zombieAnimator.SetFloat("Blend", 0f);
             zombieAnimator.SetTrigger("Attack");
+            if (!IsInvoking(nameof(SetAttackingTrue)))
+            {
+                Invoke(nameof(SetAttackingTrue), 1f);
+            }
         }
         else
         {
             zombieAnimator.SetFloat("Blend", 1f);
             zombieAnimator.SetTrigger("StopAttack");
+            isAttacking = false;
+            if (!IsInvoking(nameof(SetAttackingTrue)))
+            {
+                CancelInvoke(nameof(SetAttackingTrue));
+            }
         }
+    }
+    private void SetAttackingTrue()
+    {
+        isAttacking = true;
     }
     private void OnDrawGizmos()
     {

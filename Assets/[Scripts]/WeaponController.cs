@@ -35,6 +35,7 @@ public class WeaponController : MonoBehaviour
 
     private int currentMagSize = 30;
     private int currentAmmo = 300;
+
     
 
     // Start is called before the first frame update
