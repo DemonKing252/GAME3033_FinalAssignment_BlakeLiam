@@ -352,7 +352,7 @@ GameObject:
   - component: {fileID: 33784498}
   m_Layer: 0
   m_Name: SWATPlayer
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -474,11 +474,14 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 4294967295
-  loopFire: 1
-  startingAmmo: 120
-  startingMagSize: 30
-  fireRate: 0.1
   ammoText: {fileID: 0}
+  equippedWeapon:
+    name: AK47
+    loopFire: 1
+    fireRate: 0.1
+    ammoCount: 30
+    ammoTotal: 270
+    startingMagSize: 30
 --- !u!65 &4017719400573382057
 BoxCollider:
   m_ObjectHideFlags: 0

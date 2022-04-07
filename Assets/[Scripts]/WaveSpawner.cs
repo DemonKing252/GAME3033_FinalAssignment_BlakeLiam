@@ -48,18 +48,40 @@ public class WaveSpawner : MonoBehaviour
     [SerializeField] private TMP_Text currentWaveText;
     [SerializeField] private TMP_Text zombiesLeftText;
     [SerializeField] private List<ZombieController> zombiesInScene;
+    [SerializeField] private MonoBehaviour[] levelCompleteListeners;
+    [SerializeField] private int level = 1;
+    [SerializeField] private WaveSpawner nextSceneSpawner;
+
+    public MonoBehaviour[] LevelCompleteListeners
+    {
+        get { return levelCompleteListeners; }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Starting wave spawner..");
         currentWave = horde.waves[waveIndex];
         StartCoroutine(SpawnHorde());
     }
+    //private void OnEnable()
+    //{
+    //    currentWave = horde.waves[waveIndex];
+    //    StartCoroutine(SpawnHorde());
+    //}
 
     public void OnZombieKilled(ZombieController zombie)
     {
         zombiesInScene.Remove(zombie);
         zombiesLeftText.text = zombiesInScene.Count.ToString();
+    }
+    public void OnNextScene()
+    {
+        nextSceneSpawner.gameObject.SetActive(true);
+        this.gameObject.SetActive(false);
+
+        foreach (ILevelCompleteInterface listener in LevelCompleteListeners)
+            listener.OnCloseDoors();
     }
 
     public IEnumerator SpawnHorde()
@@ -93,11 +115,14 @@ public class WaveSpawner : MonoBehaviour
                 currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
 
         } while (waveIndex < horde.waves.Length);
+
+        foreach (ILevelCompleteInterface listener in levelCompleteListeners)
+            listener.OnLevelCompleted(level);
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
     }
 }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 740403628}
   - component: {fileID: 740403629}
   m_Layer: 0
-  m_Name: ZombieSpawn
+  m_Name: ZombieSpawn3
   m_TagString: Untagged
   m_Icon: {fileID: 2800000, guid: 56adf392a7d080448ab9b85e27356d2e, type: 3}
   m_NavMeshLayer: 0
@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 858456783}
   - component: {fileID: 858456784}
   m_Layer: 0
-  m_Name: ZombieSpawn
+  m_Name: ZombieSpawn2
   m_TagString: Untagged
   m_Icon: {fileID: 2800000, guid: 56adf392a7d080448ab9b85e27356d2e, type: 3}
   m_NavMeshLayer: 0
@@ -99,7 +99,7 @@ GameObject:
   - component: {fileID: 1749125914}
   - component: {fileID: 1749125915}
   m_Layer: 0
-  m_Name: ZombieSpawn
+  m_Name: ZombieSpawn1
   m_TagString: Untagged
   m_Icon: {fileID: 2800000, guid: 56adf392a7d080448ab9b85e27356d2e, type: 3}
   m_NavMeshLayer: 0
@@ -143,7 +143,7 @@ GameObject:
   - component: {fileID: 4491501693207851958}
   - component: {fileID: 1536024649243830257}
   m_Layer: 0
-  m_Name: ZombieSpawn (1)
+  m_Name: ZombieSpawn4
   m_TagString: Untagged
   m_Icon: {fileID: 2800000, guid: 56adf392a7d080448ab9b85e27356d2e, type: 3}
   m_NavMeshLayer: 0
@@ -228,16 +228,18 @@ MonoBehaviour:
     waves:
     - numZombies: 3
       agentSpeed: 0.6
-      spawnColliders: []
       delayBetweenSpawns: 2
     - numZombies: 5
       agentSpeed: 0.6
-      spawnColliders: []
       delayBetweenSpawns: 2
     - numZombies: 7
       agentSpeed: 0.6
-      spawnColliders: []
       delayBetweenSpawns: 2
+    spawnColliders:
+    - {fileID: 1749125915}
+    - {fileID: 858456784}
+    - {fileID: 740403629}
+    - {fileID: 1536024649243830257}
     delayToNextWave: 5
   waveIndex: 0
   zombiePrefab: {fileID: 1906054274660256794, guid: 72cee4b659fe064459aabcc90877d2b4, type: 3}
@@ -246,3 +248,4 @@ MonoBehaviour:
   currentWaveText: {fileID: 0}
   zombiesLeftText: {fileID: 0}
   zombiesInScene: []
+  level: 1
