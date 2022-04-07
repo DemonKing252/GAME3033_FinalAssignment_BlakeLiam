@@ -32,7 +32,7 @@ public class ZombieHorde
 }
 
 
-public class WaveSpawner : MonoBehaviour
+public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
 {
     public float delayForFirstWave;
 
@@ -50,7 +50,6 @@ public class WaveSpawner : MonoBehaviour
     [SerializeField] private List<ZombieController> zombiesInScene;
     [SerializeField] private MonoBehaviour[] levelCompleteListeners;
     [SerializeField] private int level = 1;
-    [SerializeField] private WaveSpawner nextSceneSpawner;
 
     public MonoBehaviour[] LevelCompleteListeners
     {
@@ -64,24 +63,27 @@ public class WaveSpawner : MonoBehaviour
         currentWave = horde.waves[waveIndex];
         StartCoroutine(SpawnHorde());
     }
-    //private void OnEnable()
-    //{
-    //    currentWave = horde.waves[waveIndex];
-    //    StartCoroutine(SpawnHorde());
-    //}
-
+    public void OnLevelCompleted(int level)
+    {
+        // Do nothing.
+    }
+    public void OnCloseDoors()
+    {
+        // This object is the NEXT wave spawner that will get turned on
+        gameObject.SetActive(true);
+    }
     public void OnZombieKilled(ZombieController zombie)
     {
         zombiesInScene.Remove(zombie);
         zombiesLeftText.text = zombiesInScene.Count.ToString();
     }
     public void OnNextScene()
-    {
-        nextSceneSpawner.gameObject.SetActive(true);
-        this.gameObject.SetActive(false);
-
+    {   
         foreach (ILevelCompleteInterface listener in LevelCompleteListeners)
             listener.OnCloseDoors();
+        
+        // Were done with this spawner
+        gameObject.SetActive(false);
     }
 
     public IEnumerator SpawnHorde()
@@ -103,7 +105,7 @@ public class WaveSpawner : MonoBehaviour
                 yield return new WaitForSeconds(horde.waves[waveIndex].delayBetweenSpawns);
             } while (zombiesRemaining >= 1);
 
-            // Wait indefinately until the player killed all of the zombies, then start the next wave.
+            // Wait indefinately until the player kills all of the zombies, then start the next wave.
             while (zombiesInScene.Count != 0)
             {
                 yield return null;
