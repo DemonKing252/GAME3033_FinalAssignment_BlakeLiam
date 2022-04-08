@@ -5,16 +5,26 @@ using UnityEngine.UI;
 using TMPro;
 
 [System.Serializable]
+public enum AgentSpeed 
+{
+    Walk,
+    Sprint
+}
+
+
+[System.Serializable]
 public class Wave
 {
+    public float health;
     public int numZombies;
-    public float agentSpeed = 0.6f;
+    public AgentSpeed agentSpeed;
     public float delayBetweenSpawns = 3f;
 
 }
 [System.Serializable]
 public class ZombieHorde
 {
+    public float spawnStartDelay;
     public Wave[] waves;
     public Collider[] spawnColliders;
     public float delayToNextWave;
@@ -34,10 +44,8 @@ public class ZombieHorde
 
 public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
 {
-    public float delayForFirstWave;
 
     public ZombieHorde horde;
-    private Wave currentWave;
     public int waveIndex = 0;
     public ZombieController zombiePrefab;
 
@@ -60,7 +68,6 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
     void Start()
     {
         Debug.Log("Starting wave spawner..");
-        currentWave = horde.waves[waveIndex];
         StartCoroutine(SpawnHorde());
     }
     public void OnLevelCompleted(int level)
@@ -88,6 +95,7 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
 
     public IEnumerator SpawnHorde()
     {
+        yield return new WaitForSeconds(horde.spawnStartDelay);
         do
         {
             zombiesLeftText.text = horde.waves[waveIndex].numZombies.ToString();
@@ -97,7 +105,9 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
             do
             {
                 ZombieController zController = Instantiate(zombiePrefab, horde.GetRandomPointInSpawners(), Quaternion.identity);
-                zController.Seek(playerTransform);
+                zController.Seek(playerTransform, horde.waves[waveIndex].agentSpeed, horde.waves[waveIndex].health);
+                
+                
                 zombiesInScene.Add(zController);
 
                 zombiesRemaining--;

@@ -11,16 +11,23 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private Transform playerTransform;
     [SerializeField] private float minDist;
     [SerializeField] private Transform fromTransform;
-    [SerializeField] private float startingHealth = 100f;
     private float currentHealth;
 
     public int waveIndex = 0;
     public WaveSpawner[] waveSpawners;
     public bool isAttacking;
 
-    public void Seek(Transform transf)
+    public void Seek(Transform transf, AgentSpeed speed, float health)
     {
-        playerTransform = transf;    
+        playerTransform = transf;
+        currentHealth = health;
+
+        agent.speed = speed switch
+        {
+            AgentSpeed.Walk => 0.6f,
+            AgentSpeed.Sprint => 1.8f,        
+        };
+
     }
 
     private void Awake()
@@ -33,7 +40,6 @@ public class ZombieController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentHealth = startingHealth;
         waveSpawners = FindObjectsOfType<WaveSpawner>();
     }
 
@@ -79,7 +85,11 @@ public class ZombieController : MonoBehaviour
         }
         else
         {
-            zombieAnimator.SetFloat("Blend", 1f);
+            if (agent.speed == 1.8f)
+                zombieAnimator.SetFloat("Blend", 1f);
+            if (agent.speed == 0.6f)
+                zombieAnimator.SetFloat("Blend", 0.5f);
+
             zombieAnimator.SetTrigger("StopAttack");
             isAttacking = false;
             if (!IsInvoking(nameof(SetAttackingTrue)))

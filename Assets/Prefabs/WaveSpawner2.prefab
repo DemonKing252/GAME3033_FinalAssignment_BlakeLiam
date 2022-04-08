@@ -60,7 +60,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3497053103824385096
 Transform:
   m_ObjectHideFlags: 0
@@ -90,16 +90,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82c0438698b25394ea23258f302a3db3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  delayForFirstWave: 0
   horde:
     waves:
-    - numZombies: 3
-      agentSpeed: 0.6
+    - numZombies: 5
+      agentSpeed: 0
       delayBetweenSpawns: 2
     spawnColliders:
     - {fileID: 4832736430627482386}
     - {fileID: 4832736430009180889}
-    - {fileID: 0}
     - {fileID: 6215066898838472696}
     delayToNextWave: 5
   waveIndex: 0
@@ -112,8 +110,8 @@ MonoBehaviour:
   levelCompleteListeners:
   - {fileID: 0}
   - {fileID: 0}
-  level: 1
-  nextSceneSpawner: {fileID: 0}
+  - {fileID: 0}
+  level: 2
 --- !u!1 &4832736430009180871
 GameObject:
   m_ObjectHideFlags: 0
