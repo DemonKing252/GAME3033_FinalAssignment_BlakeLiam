@@ -69,8 +69,12 @@ public class PlayerController : MonoBehaviour
     public bool isReloading = false;
 
     private float health = 100f;
-    private float armour = 40f;
+    private float armour = 40f; 
     
+    public float Health { get { return health; } set { health = Mathf.Min(value, 100f); RefreshUI(); } }
+    public float Armour { get { return armour; } set { armour = Mathf.Min(value, 100f); RefreshUI(); } }
+
+
     // Start is called before the first frame update
     void Start()
     {

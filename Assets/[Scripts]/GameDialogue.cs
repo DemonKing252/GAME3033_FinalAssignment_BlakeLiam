@@ -9,11 +9,17 @@ public class GameDialogue : MonoBehaviour, ILevelCompleteInterface
 
     public void OnLevelCompleted(int level)
     {
-        dialogueText.text = "Level " + level.ToString() + " completed. Door opened, proceed to the next area.";
+        StartCoroutine(OnDialogue("Level " + level.ToString() + " completed. Door opened, proceed to the next area."));
     }
     public void OnCloseDoors()
     {
-        dialogueText.text = "Doors closed, get ready for more zombies!";
+        StartCoroutine(OnDialogue("Doors closed, get ready for more zombies!"));
+    }
+    private IEnumerator OnDialogue(string dialogue)
+    {
+        dialogueText.text = dialogue;
+        yield return new WaitForSeconds(5f);
+        dialogueText.text = string.Empty;
     }
 
     // Start is called before the first frame update
