@@ -39,6 +39,8 @@ public class WeaponPickup : MonoBehaviour
                 weaponType = (WeaponType)currentPlayerWeapon;
                 SetWeaponEquipped(weaponType);
 
+                weaponController.RefreshWeaponProperties();
+
                 gameDialogue.SetDialogue("Press [E] to swap for " + weaponType.ToString());
             }
         }

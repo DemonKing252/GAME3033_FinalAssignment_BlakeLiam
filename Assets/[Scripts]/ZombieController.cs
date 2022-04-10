@@ -54,7 +54,7 @@ public class ZombieController : MonoBehaviour
             Debug.Log("bullet collision");
             Destroy(collision.gameObject);
 
-            currentHealth -= 30f;
+            currentHealth -= WeaponController.Instance.EquippedWeapon.GetComponent<WeaponProperties>().weapon.damage;
             if (currentHealth <= 0f)
             {
                 capsuleCollider.enabled = false;

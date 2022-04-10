@@ -4,38 +4,20 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-[System.Serializable]
-public class Weapon
-{
-    public string name = "AK47";
-    public bool loopFire;
-    public float fireRate = 0.2f;
-    public int ammoCount = 30;
-    public int ammoTotal = 90;
-    public int startingMagSize = 30;
-}
-public enum WeaponType
-{
-    AK_47,
-    DoubleBarrelShotgun
-
-}
-
-
 public class WeaponController : MonoBehaviour
 {
     [SerializeField] private GameObject[] weaponPrefabs;
     [SerializeField] private List<GameObject> equippedWeapons;
     [SerializeField] private Transform armSocketTransform_Idle;
     [SerializeField] private Transform armSocketTransform_Moving;
+    [SerializeField] private TMP_Text weaponNameText;
+
 
     [SerializeField] private GameObject bulletPrefab;
 
     private PlayerController pController;
 
     private GameObject heldWeapon;
-    //public Transform ak47MuzzleBack;
-    //public Transform ak47MuzzleFront;
 
     [SerializeField] private Image ui;
     [SerializeField] private Camera cam;
@@ -44,12 +26,18 @@ public class WeaponController : MonoBehaviour
 
     private bool canFireWeapon = false;
 
-    [SerializeField] private Weapon equippedWeapon;
+    private static WeaponController s_pWeaponController;
+    public static WeaponController Instance => s_pWeaponController;
+    public GameObject EquippedWeapon { get { return equippedWeapons[(int)weaponType]; } }
 
-    // This will eventually move to a Weapon script on the prefab once we have multiple weapons.
-
+    
     public WeaponType weaponType = WeaponType.AK_47;
-    // Start is called before the first frame update
+
+    void Awake()
+    {
+        s_pWeaponController = this;    
+    }
+
     void Start()
     {
         //GameObject go = Instantiate(ak47Prefab, armSocketTransform_Idle);
@@ -65,9 +53,6 @@ public class WeaponController : MonoBehaviour
         
         heldWeapon = equippedWeapons[(int)weaponType];
 
-        //ak47MuzzleBack = equippedWeapons[(int)weaponType].transform.Find("Muzzle1");
-        //ak47MuzzleFront = equippedWeapons[(int)weaponType].transform.Find("Muzzle2");
-
 
         pController = GetComponent<PlayerController>();
         pController.SetGripTransform(equippedWeapons[(int)weaponType].transform.Find("Grip"));
@@ -75,9 +60,14 @@ public class WeaponController : MonoBehaviour
         pController.onMovementStateChanged += OnMovementStateChanged;
         pController.onAimStateChanged += OnAimStateChanged;
 
-
-        ammoText.text = equippedWeapon.ammoCount.ToString() + " / " + equippedWeapon.ammoTotal.ToString();
+        RefreshWeaponProperties();
     }
+    public void RefreshWeaponProperties()
+    {
+        ammoText.text = equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount.ToString() + " / " + equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal.ToString();
+        weaponNameText.text = equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.name;
+    }
+
     public void SetActiveWeapon(WeaponType weaponType)
     {
         this.weaponType = weaponType;
@@ -151,13 +141,13 @@ public class WeaponController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && canFireWeapon)
         {
-            if (equippedWeapon.loopFire && equippedWeapon.ammoCount > 0)
+            if (equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.loopFire && equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount > 0)
             {
-                InvokeRepeating(nameof(InvokeFire), 0f, equippedWeapon.fireRate);
+                InvokeRepeating(nameof(InvokeFire), 0f, equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.fireRate);
             }
             else
             {
-                if (equippedWeapon.ammoCount > 0)
+                if (equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount > 0)
                     OnFire();
             }
         }
@@ -175,19 +165,19 @@ public class WeaponController : MonoBehaviour
 
         pController.anim.SetTrigger("IsReloading");
 
-        int ammoDifference = equippedWeapon.startingMagSize - equippedWeapon.ammoCount;
-        if (equippedWeapon.ammoTotal > ammoDifference)
+        int ammoDifference = equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.startingMagSize - equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount;
+        if (equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal > ammoDifference)
         {
-            equippedWeapon.ammoCount += ammoDifference;
-            equippedWeapon.ammoTotal -= ammoDifference;
+            equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount += ammoDifference;
+            equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal -= ammoDifference;
         }
         else
         {
-            equippedWeapon.ammoCount += equippedWeapon.ammoTotal;
-            equippedWeapon.ammoTotal = 0;
+            equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount += equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal;
+            equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal = 0;
         }
 
-        ammoText.text = equippedWeapon.ammoCount.ToString() + " / " + equippedWeapon.ammoTotal.ToString();
+        ammoText.text = equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount.ToString() + " / " + equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal.ToString();
 
         pController.isReloading = true;
 
@@ -198,15 +188,15 @@ public class WeaponController : MonoBehaviour
 
     public void InvokeFire()
     {
-        if (equippedWeapon.ammoCount <= 0)
+        if (equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount <= 0)
             CancelInvoke(nameof(InvokeFire));
         else
             OnFire();
     }
     public void OnFire()
     {
-        equippedWeapon.ammoCount--;
-        ammoText.text = equippedWeapon.ammoCount.ToString() + " / " + equippedWeapon.ammoTotal.ToString();
+        equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount--;
+        ammoText.text = equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount.ToString() + " / " + equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal.ToString();
 
         GameObject bullet = Instantiate(bulletPrefab);
         pController.anim.SetTrigger("IsFiring");

@@ -212,6 +212,14 @@ MonoBehaviour:
   gripIKTransform: {fileID: 4121020526654007370}
   muzzleFront: {fileID: 1652052430887531041}
   muzzleBack: {fileID: 7231608091867721095}
+  weapon:
+    name: Double Barrel Shotgun
+    loopFire: 0
+    fireRate: 0
+    ammoCount: 2
+    ammoTotal: 32
+    startingMagSize: 2
+    damage: 120
 --- !u!1 &1473023938731119291
 GameObject:
   m_ObjectHideFlags: 0
