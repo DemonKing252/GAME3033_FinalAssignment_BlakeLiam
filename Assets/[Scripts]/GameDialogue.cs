@@ -21,7 +21,8 @@ public class GameDialogue : MonoBehaviour, ILevelCompleteInterface
         yield return new WaitForSeconds(5f);
         dialogueText.text = string.Empty;
     }
-
+    public void SetDialogue(string dialogue) { dialogueText.text = dialogue; }
+    public void ClearDialogue() { dialogueText.text = string.Empty; }
     // Start is called before the first frame update
     void Start()
     {

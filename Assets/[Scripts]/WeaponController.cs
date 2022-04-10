@@ -14,11 +14,18 @@ public class Weapon
     public int ammoTotal = 90;
     public int startingMagSize = 30;
 }
+public enum WeaponType
+{
+    AK_47,
+    DoubleBarrelShotgun
+
+}
 
 
 public class WeaponController : MonoBehaviour
 {
-    [SerializeField] private GameObject ak47Prefab;
+    [SerializeField] private GameObject[] weaponPrefabs;
+    [SerializeField] private List<GameObject> equippedWeapons;
     [SerializeField] private Transform armSocketTransform_Idle;
     [SerializeField] private Transform armSocketTransform_Moving;
 
@@ -27,8 +34,8 @@ public class WeaponController : MonoBehaviour
     private PlayerController pController;
 
     private GameObject heldWeapon;
-    public Transform ak47MuzzleBack;
-    public Transform ak47MuzzleFront;
+    //public Transform ak47MuzzleBack;
+    //public Transform ak47MuzzleFront;
 
     [SerializeField] private Image ui;
     [SerializeField] private Camera cam;
@@ -40,27 +47,48 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Weapon equippedWeapon;
 
     // This will eventually move to a Weapon script on the prefab once we have multiple weapons.
-   
 
-
+    public WeaponType weaponType = WeaponType.AK_47;
     // Start is called before the first frame update
     void Start()
     {
-        GameObject go = Instantiate(ak47Prefab, armSocketTransform_Idle);
-        heldWeapon = go;
+        //GameObject go = Instantiate(ak47Prefab, armSocketTransform_Idle);
+        for (int i = 0; i < weaponPrefabs.Length; i++)
+        {
+            GameObject go = Instantiate(weaponPrefabs[i], armSocketTransform_Idle);
+            equippedWeapons.Add(go);
+            if ((WeaponType)i != weaponType)
+            {
+                equippedWeapons[i].SetActive(false);
+            }
+        }
+        
+        heldWeapon = equippedWeapons[(int)weaponType];
 
-        ak47MuzzleBack = go.transform.Find("Muzzle1");
-        ak47MuzzleFront = go.transform.Find("Muzzle2");
+        //ak47MuzzleBack = equippedWeapons[(int)weaponType].transform.Find("Muzzle1");
+        //ak47MuzzleFront = equippedWeapons[(int)weaponType].transform.Find("Muzzle2");
 
 
         pController = GetComponent<PlayerController>();
-        pController.SetGripTransform(go.transform.Find("Grip"));
+        pController.SetGripTransform(equippedWeapons[(int)weaponType].transform.Find("Grip"));
 
         pController.onMovementStateChanged += OnMovementStateChanged;
         pController.onAimStateChanged += OnAimStateChanged;
 
 
         ammoText.text = equippedWeapon.ammoCount.ToString() + " / " + equippedWeapon.ammoTotal.ToString();
+    }
+    public void SetActiveWeapon(WeaponType weaponType)
+    {
+        this.weaponType = weaponType;
+        for (int i = 0; i < weaponPrefabs.Length; i++)
+        {
+            if ((WeaponType)i != weaponType)
+            {
+                equippedWeapons[i].SetActive(false);
+            }
+            equippedWeapons[(int)weaponType].SetActive(true);
+        }
     }
 
     private void OnDestroy()
@@ -182,8 +210,8 @@ public class WeaponController : MonoBehaviour
 
         GameObject bullet = Instantiate(bulletPrefab);
         pController.anim.SetTrigger("IsFiring");
-        Vector3 dir = GetCrossHairWorldPoint() - ak47MuzzleBack.position;
-        bullet.GetComponent<BulletComponent>().FireAt(ak47MuzzleBack.position, dir, 60f, 10f);
+        Vector3 dir = GetCrossHairWorldPoint() - equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().muzzleBack.position;
+        bullet.GetComponent<BulletComponent>().FireAt(equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().muzzleFront.position, dir, 60f, 10f);
 
     }
 
