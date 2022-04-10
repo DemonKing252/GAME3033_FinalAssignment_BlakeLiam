@@ -24,6 +24,6 @@ public class Weapon
 public enum WeaponType
 {
     AK_47,
-    DoubleBarrelShotgun
-
+    DoubleBarrelShotgun,
+    Rifle,
 }

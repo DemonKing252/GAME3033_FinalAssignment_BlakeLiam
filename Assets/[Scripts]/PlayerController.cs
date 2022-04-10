@@ -215,7 +215,7 @@ public class PlayerController : MonoBehaviour
         if (!isReloading)
         {
             anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-            anim.SetIKPosition(AvatarIKGoal.LeftHand, rightHandTransform.position);
+            anim.SetIKPosition(AvatarIKGoal.LeftHand, WeaponController.Instance.EquippedWeapon.GetComponent<WeaponProperties>().gripIKTransform.position);
         
         }
         
