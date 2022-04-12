@@ -26,8 +26,8 @@ public class WeaponController : MonoBehaviour
 
     private bool canFireWeapon = false;
 
-    private static WeaponController s_pWeaponController;
-    public static WeaponController Instance => s_pWeaponController;
+    private static WeaponController sInstance;
+    public static WeaponController Instance => sInstance;
     public GameObject EquippedWeapon { get { return equippedWeapons[(int)weaponType]; } }
 
     
@@ -35,7 +35,7 @@ public class WeaponController : MonoBehaviour
 
     void Awake()
     {
-        s_pWeaponController = this;    
+        sInstance = this;    
     }
 
     void Start()
@@ -92,7 +92,6 @@ public class WeaponController : MonoBehaviour
     {
         if (moving)
         {
-            //Debug.Log(Camera.main.ScreenToWorldPoint(ui.transform.position));
 
 
             heldWeapon.transform.position = armSocketTransform_Moving.position;

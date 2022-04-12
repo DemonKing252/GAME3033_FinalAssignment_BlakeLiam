@@ -67,7 +67,6 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Starting wave spawner..");
         StartCoroutine(SpawnHorde());
     }
     public void OnLevelCompleted(int level)

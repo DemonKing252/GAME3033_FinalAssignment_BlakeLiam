@@ -81,7 +81,6 @@ public class PlayerController : MonoBehaviour
         targetPosition = lookAtTransform.position;
         lookAtTransform.position = lookAtAiming.position;
         originalRotation = boneTransform.rotation;
-        Cursor.lockState = CursorLockMode.Locked;
         onAimStateChanged.Invoke(false);
         RefreshUI();
     }
@@ -161,7 +160,6 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
-            Debug.Log("Collision enter with the ground.");
             anim.SetBool("IsJumping", false);
         }
         if (other.gameObject.CompareTag("Arm"))
@@ -176,6 +174,11 @@ public class PlayerController : MonoBehaviour
                     armour = Mathf.Max(armour, 0);
 
                     RefreshUI();
+
+                    if (health <= 0f)
+                    {
+                        MenuController.Instance.OnActionByEnum(Action.Defeat);
+                    }
                 }
             }
         }

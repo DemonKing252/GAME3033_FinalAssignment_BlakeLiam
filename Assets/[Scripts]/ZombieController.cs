@@ -51,7 +51,6 @@ public class ZombieController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Bullet"))
         {
-            Debug.Log("bullet collision");
             Destroy(collision.gameObject);
 
             currentHealth -= WeaponController.Instance.EquippedWeapon.GetComponent<WeaponProperties>().weapon.damage;
