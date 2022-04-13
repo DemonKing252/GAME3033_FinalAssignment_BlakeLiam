@@ -44,7 +44,7 @@ public class ZombieHorde
 
 public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
 {
-
+    public int zombiesRemaining;
     public ZombieHorde horde;
     public int waveIndex = 0;
     public ZombieController zombiePrefab;
@@ -59,10 +59,9 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
     [SerializeField] private MonoBehaviour[] levelCompleteListeners;
     [SerializeField] private int level = 1;
 
-    public MonoBehaviour[] LevelCompleteListeners
-    {
-        get { return levelCompleteListeners; }
-    }
+    public MonoBehaviour[] LevelCompleteListeners => levelCompleteListeners;
+    public List<ZombieController> Zombies => zombiesInScene;
+    public void AddZombie(ZombieController z) { zombiesInScene.Add(z); }
 
     // Start is called before the first frame update
     void Start()
@@ -100,7 +99,7 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
             zombiesLeftText.text = horde.waves[waveIndex].numZombies.ToString();
             currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
 
-            int zombiesRemaining = horde.waves[waveIndex].numZombies;
+            zombiesRemaining = horde.waves[waveIndex].numZombies;
             do
             {
                 ZombieController zController = Instantiate(zombiePrefab, horde.GetRandomPointInSpawners(), Quaternion.identity);

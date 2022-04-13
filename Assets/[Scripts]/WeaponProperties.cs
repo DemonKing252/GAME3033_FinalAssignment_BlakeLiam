@@ -21,6 +21,7 @@ public class Weapon
     public int startingMagSize = 30;
     public float damage;
 }
+[System.Serializable]
 public enum WeaponType
 {
     AK_47,

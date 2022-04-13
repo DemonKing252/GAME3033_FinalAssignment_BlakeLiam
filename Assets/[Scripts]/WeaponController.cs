@@ -16,6 +16,7 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;
 
     private PlayerController pController;
+    public PlayerController PlayerCtrl => pController;
 
     private GameObject heldWeapon;
 
@@ -28,8 +29,8 @@ public class WeaponController : MonoBehaviour
 
     private static WeaponController sInstance;
     public static WeaponController Instance => sInstance;
-    public GameObject EquippedWeapon { get { return equippedWeapons[(int)weaponType]; } }
-
+    public GameObject EquippedWeapon => equippedWeapons[(int)weaponType];
+    public List<GameObject> GetAllWeapons => equippedWeapons;
     
     public WeaponType weaponType = WeaponType.AK_47;
 

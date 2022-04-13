@@ -20,6 +20,12 @@ public enum Action
 }
 public class MenuController : MonoBehaviour
 {
+    public delegate void SaveGameEvent();
+    public delegate void LoadGameEvent();
+    public event SaveGameEvent onSaveGame;
+    public event LoadGameEvent onLoadGame;
+
+
     [SerializeField] private TMP_Text playerSkillText;
 
     [SerializeField] Canvas gameCanvas;
@@ -178,11 +184,13 @@ public class MenuController : MonoBehaviour
     }
     private void LoadGame()
     {
-        Debug.Log("Loading game...");
+        onLoadGame?.Invoke();
+        //Debug.Log("Loading game...");
     }
     private void SaveAndQuit()
     {
-        Debug.Log("Saving game...");
+        onSaveGame?.Invoke();
+        //Debug.Log("Saving game...");
     }
 
 }

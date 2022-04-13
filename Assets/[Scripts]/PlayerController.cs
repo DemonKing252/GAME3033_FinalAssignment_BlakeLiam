@@ -74,6 +74,7 @@ public class PlayerController : MonoBehaviour
     public float Health { get { return health; } set { health = Mathf.Min(value, 100f); RefreshUI(); } }
     public float Armour { get { return armour; } set { armour = Mathf.Min(value, 100f); RefreshUI(); } }
 
+    public CharacterController Controller => characterController;
 
     // Start is called before the first frame update
     void Start()

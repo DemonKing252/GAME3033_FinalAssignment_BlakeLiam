@@ -12,6 +12,7 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private float minDist;
     [SerializeField] private Transform fromTransform;
     private float currentHealth;
+    public float CurrentHealth { get { return currentHealth; } set { currentHealth = value; } }
 
     public int waveIndex = 0;
     public WaveSpawner[] waveSpawners;
