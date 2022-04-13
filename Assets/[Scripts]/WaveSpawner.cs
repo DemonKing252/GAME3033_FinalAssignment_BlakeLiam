@@ -62,11 +62,21 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
     public MonoBehaviour[] LevelCompleteListeners => levelCompleteListeners;
     public List<ZombieController> Zombies => zombiesInScene;
     public void AddZombie(ZombieController z) { zombiesInScene.Add(z); }
+    public int Level { get { return level; } set { level = value; } }
+
 
     // Start is called before the first frame update
     void Start()
     {
+        Invoke(nameof(Spawn), 2.5f);
+    }
+    public void Spawn()
+    {
         StartCoroutine(SpawnHorde());
+    }
+    public void CancelSpawn()
+    {
+        CancelInvoke(nameof(Spawn));
     }
     public void OnLevelCompleted(int level)
     {
@@ -93,41 +103,56 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
 
     public IEnumerator SpawnHorde()
     {
+        Debug.Log("Starting horde..");
         yield return new WaitForSeconds(horde.spawnStartDelay);
-        do
-        {
-            zombiesLeftText.text = horde.waves[waveIndex].numZombies.ToString();
-            currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
 
-            zombiesRemaining = horde.waves[waveIndex].numZombies;
+        if (waveIndex < horde.waves.Length)
+        {
             do
             {
-                ZombieController zController = Instantiate(zombiePrefab, horde.GetRandomPointInSpawners(), Quaternion.identity);
-                zController.Seek(playerTransform, horde.waves[waveIndex].agentSpeed, horde.waves[waveIndex].health);
-                
-                
-                zombiesInScene.Add(zController);
-
-                zombiesRemaining--;
-
-                yield return new WaitForSeconds(horde.waves[waveIndex].delayBetweenSpawns);
-            } while (zombiesRemaining >= 1);
-
-            // Wait indefinately until the player kills all of the zombies, then start the next wave.
-            while (zombiesInScene.Count != 0)
-            {
-                yield return null;
-            }
-            yield return new WaitForSeconds(horde.delayToNextWave);
-
-            waveIndex++;
-            if (waveIndex <= horde.waves.Length - 1)
+                zombiesLeftText.text = horde.waves[waveIndex].numZombies.ToString();
                 currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
 
-        } while (waveIndex < horde.waves.Length);
+                zombiesRemaining = (horde.waves[waveIndex].numZombies - zombiesInScene.Count) - WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound;
+                Debug.Log(zombiesRemaining);
 
-        foreach (ILevelCompleteInterface listener in levelCompleteListeners)
-            listener.OnLevelCompleted(level);
+                while (zombiesRemaining > 0)
+                {
+                    ZombieController zController = Instantiate(zombiePrefab, horde.GetRandomPointInSpawners(), Quaternion.identity);
+                    zController.Seek(playerTransform, horde.waves[waveIndex].agentSpeed, horde.waves[waveIndex].health);
+
+
+                    zombiesInScene.Add(zController);
+
+                    zombiesRemaining--;
+
+                    yield return new WaitForSeconds(horde.waves[waveIndex].delayBetweenSpawns);
+                }
+
+                // Wait indefinately until the player kills all of the zombies, then start the next wave.
+                while (zombiesInScene.Count != 0)
+                {
+                    yield return null;
+                }
+                WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound = 0;
+                yield return new WaitForSeconds(horde.delayToNextWave);
+
+                waveIndex++;
+                if (waveIndex <= horde.waves.Length - 1)
+                    currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
+
+            } while (waveIndex < horde.waves.Length);
+
+            foreach (ILevelCompleteInterface listener in levelCompleteListeners)
+                listener.OnLevelCompleted(level);
+        }
+        else
+        {
+
+            foreach (ILevelCompleteInterface listener in levelCompleteListeners)
+                listener.OnLevelCompleted(level);
+        }
+        
 
     }
 

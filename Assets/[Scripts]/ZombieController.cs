@@ -60,7 +60,7 @@ public class ZombieController : MonoBehaviour
                 capsuleCollider.enabled = false;
                 agent.isStopped = true;
                 zombieAnimator.SetTrigger("Death");
-
+                WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound++;
                 Destroy(gameObject, 5f);
             }
         }

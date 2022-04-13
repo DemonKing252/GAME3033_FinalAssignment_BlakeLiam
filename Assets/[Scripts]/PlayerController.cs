@@ -67,6 +67,8 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 0f;
     private bool isGrounded = true;
     public bool isReloading = false;
+    public int zombiesKilledThisRound = 0;
+    public int sceneIndex = 0;
 
     private float health = 100f;
     private float armour = 40f; 

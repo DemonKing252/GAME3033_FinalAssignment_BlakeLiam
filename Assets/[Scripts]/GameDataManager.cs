@@ -57,6 +57,10 @@ public class SZombie
 public class SWave
 {
     public List<SZombie> zombies = new List<SZombie>();
+
+    public int level;
+    public int waveIdx;
+
 }
 
 
@@ -70,7 +74,10 @@ public class SaveGameData
     public List<Weapon> weapons = new List<Weapon>();
     public WeaponType heldWeapon;
 
-    public SWave wave1;
+    public SWave[] waves = new SWave[3];
+    public int hordeNumber = 1;
+    public int zombiesKilledThisRound = 0;
+    public int sceneIndex;
 }
 
 
@@ -89,6 +96,9 @@ public class GameDataManager : MonoBehaviour
         path = Application.dataPath + Path.DirectorySeparatorChar + "Resources" + Path.DirectorySeparatorChar + "SaveGame.json";
         MenuController.Instance.onSaveGame += SaveGame;
         MenuController.Instance.onLoadGame += LoadGame;
+
+        //waves[1].gameObject.SetActive(false);
+        //waves[2].gameObject.SetActive(false);
     
     }
     private void OnDestroy()
@@ -100,36 +110,45 @@ public class GameDataManager : MonoBehaviour
     public void SaveGame()
     {
         //saveGame = new SaveGameData();
-        saveGame.wave1.zombies.Clear();
+
+        for (int i = 0; i < saveGame.waves.Length; i++)
+        {
+            saveGame.waves[i].zombies.Clear();
+        }
+
         saveGame.weapons.Clear();
 
         saveGame.playerPos = new SVector3(WeaponController.Instance.transform.position);
         saveGame.playerRot = new SQuat(WeaponController.Instance.transform.rotation);
 
-        //saveGame.weapons = WeaponController.Instance.GetAllWeapons();
-        
-        foreach(GameObject weapon in WeaponController.Instance.GetAllWeapons)
+        foreach (GameObject weapon in WeaponController.Instance.GetAllWeapons)
         {
             saveGame.weapons.Add(weapon.GetComponent<WeaponProperties>().weapon);
             saveGame.heldWeapon = WeaponController.Instance.weaponType;
-            //sweapon.weaponType = weapon.GetComponent<WeaponProperties>(
         }
-
-        
-        foreach(ZombieController z in waves[0].Zombies)
+        for (int i = 0; i < saveGame.waves.Length; i++)
         {
-            SZombie zombie = new SZombie();
-            zombie.position = new SVector3(z.transform.position);
-            zombie.rotation = new SQuat(z.transform.rotation);
-            zombie.waveIndex = z.waveIndex;
-            zombie.currentHealth = z.CurrentHealth;
 
-            saveGame.wave1.zombies.Add(zombie);
+            saveGame.waves[i].level = waves[i].Level;
+            saveGame.waves[i].waveIdx = waves[i].waveIndex;
         }
 
-        //saveGame.weaponType = WeaponController.Instance.weaponType;
-        //saveGame.weapon = WeaponController.Instance.EquippedWeapon.GetComponent<WeaponProperties>().weapon;
+        for(int i = 0; i < waves.Length; i++)
+        {
+            foreach (ZombieController z in waves[i].Zombies)
+            {
+                SZombie zombie = new SZombie();
+                zombie.position = new SVector3(z.transform.position);
+                zombie.rotation = new SQuat(z.transform.rotation);
+                zombie.waveIndex = z.waveIndex;
+                zombie.currentHealth = z.CurrentHealth;
 
+                saveGame.waves[i].zombies.Add(zombie);
+            }
+        }
+
+        saveGame.zombiesKilledThisRound = WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound;
+        saveGame.sceneIndex = WeaponController.Instance.PlayerCtrl.sceneIndex;
         string data = JsonUtility.ToJson(saveGame, true);
         StreamWriter sw = new StreamWriter(path);
         sw.Write(data);
@@ -147,18 +166,40 @@ public class GameDataManager : MonoBehaviour
 
 
         saveGame.weapons.Clear();
-        saveGame.wave1.zombies.Clear();
-
-        foreach (ZombieController z in waves[0].Zombies)
+        for (int i = 0; i < saveGame.waves.Length; i++)
         {
-            Destroy(z.gameObject);
+            saveGame.waves[i].zombies.Clear();
         }
-        waves[0].Zombies.Clear();
-
+        for (int i = 0; i < saveGame.waves.Length; i++)
+        {
+            foreach (ZombieController z in waves[i].Zombies)
+            {
+                Destroy(z.gameObject);
+            }
+        }
+        for (int i = 0; i < saveGame.waves.Length; i++)
+        {
+            waves[i].Zombies.Clear();
+        }
         StreamReader sr = new StreamReader(path);
         string raw = sr.ReadToEnd();
         saveGame = JsonUtility.FromJson<SaveGameData>(raw);
-        sr.Close();
+        sr.Close(); 
+        
+        for (int i = 0; i < 3; i++)
+        {
+            if (i == saveGame.sceneIndex)
+            {
+                waves[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                waves[i].GetComponent<WaveSpawner>().CancelSpawn();
+                waves[i].gameObject.SetActive(false);
+
+            }
+
+        }
 
         WeaponController.Instance.PlayerCtrl.Controller.enabled = false;
 
@@ -177,18 +218,32 @@ public class GameDataManager : MonoBehaviour
         WeaponController.Instance.SetActiveWeapon(saveGame.heldWeapon);
         WeaponController.Instance.RefreshWeaponProperties();
 
-
-        for(int i = 0; i < saveGame.wave1.zombies.Count; i++)
+        
+        for (int i = 0; i < saveGame.waves.Length; i++)
         {
-            ZombieController zombie = Instantiate(waves[0].zombiePrefab, saveGame.wave1.zombies[i].position.ToVector(), saveGame.wave1.zombies[i].rotation.ToQuat());
-            zombie.waveIndex = saveGame.wave1.zombies[i].waveIndex;
-            zombie.Seek(WeaponController.Instance.transform, AgentSpeed.Walk, saveGame.wave1.zombies[i].currentHealth);
-            waves[0].AddZombie(zombie);
+            waves[i].Level = saveGame.waves[i].level;
+            waves[i].waveIndex = saveGame.waves[i].waveIdx;
+            
+        }        
+
+        for (int j = 0; j < waves.Length; j++)
+        {
+            for (int i = 0; i < saveGame.waves[j].zombies.Count; i++)
+            {
+                ZombieController zombie = Instantiate(waves[j].zombiePrefab, saveGame.waves[j].zombies[i].position.ToVector(), saveGame.waves[j].zombies[i].rotation.ToQuat());
+                zombie.waveIndex = saveGame.waves[j].zombies[i].waveIndex;
+                zombie.Seek(WeaponController.Instance.transform, AgentSpeed.Walk, saveGame.waves[j].zombies[i].currentHealth);
+                waves[j].AddZombie(zombie);
+            }
         }
+        WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound = saveGame.zombiesKilledThisRound;
 
+        WeaponController.Instance.PlayerCtrl.sceneIndex = saveGame.sceneIndex;
 
-        waves[1].gameObject.SetActive(false);
-        waves[2].gameObject.SetActive(false);
+        //waves[1].gameObject.SetActive(false);
+        //waves[2].gameObject.SetActive(false);
+        
+        
 
         //Debug.Log(WeaponController.Instance.transform.position.ToString());
     }
@@ -197,6 +252,10 @@ public class GameDataManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K))
         {
             SaveGame();
+        }
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadGame();
         }
         //p.position = new Vector3(0f, 100f, 0f);
         //Debug.Log(p.position);
