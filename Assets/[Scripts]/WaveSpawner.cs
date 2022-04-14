@@ -94,6 +94,7 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
     }
     public void OnNextScene()
     {   
+
         foreach (ILevelCompleteInterface listener in LevelCompleteListeners)
             listener.OnCloseDoors();
         

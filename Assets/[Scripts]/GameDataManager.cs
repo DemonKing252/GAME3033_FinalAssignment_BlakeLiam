@@ -70,6 +70,8 @@ public class SaveGameData
     // Player data
     public SVector3 playerPos;
     public SQuat playerRot;
+    public float health;
+    public float armour;
 
     public List<Weapon> weapons = new List<Weapon>();
     public WeaponType heldWeapon;
@@ -89,6 +91,14 @@ public class GameDataManager : MonoBehaviour
 
     public SaveGameData saveGame = new SaveGameData();
     public WaveSpawner[] waves;
+    private static GameDataManager instance;
+    public static GameDataManager Instance => instance;
+
+    void Awake()
+    {
+        instance = this;
+    }
+
 
     // Start is called before the first frame update
     void Start()
@@ -97,9 +107,6 @@ public class GameDataManager : MonoBehaviour
         MenuController.Instance.onSaveGame += SaveGame;
         MenuController.Instance.onLoadGame += LoadGame;
 
-        //waves[1].gameObject.SetActive(false);
-        //waves[2].gameObject.SetActive(false);
-    
     }
     private void OnDestroy()
     {
@@ -109,8 +116,6 @@ public class GameDataManager : MonoBehaviour
 
     public void SaveGame()
     {
-        //saveGame = new SaveGameData();
-
         for (int i = 0; i < saveGame.waves.Length; i++)
         {
             saveGame.waves[i].zombies.Clear();
@@ -146,6 +151,8 @@ public class GameDataManager : MonoBehaviour
                 saveGame.waves[i].zombies.Add(zombie);
             }
         }
+        saveGame.health = WeaponController.Instance.PlayerCtrl.Health;
+        saveGame.armour = WeaponController.Instance.PlayerCtrl.Armour;
 
         saveGame.zombiesKilledThisRound = WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound;
         saveGame.sceneIndex = WeaponController.Instance.PlayerCtrl.sceneIndex;
@@ -154,6 +161,25 @@ public class GameDataManager : MonoBehaviour
         sw.Write(data);
         sw.Close();
     }
+    public void Reset()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            // first one will be active
+            if (i == 0)
+            {
+                waves[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                waves[i].GetComponent<WaveSpawner>().CancelSpawn();
+                waves[i].gameObject.SetActive(false);
+
+            }
+
+        }
+    }
+
     public void LoadGame()
     {
         StartCoroutine(Delay());
@@ -198,7 +224,6 @@ public class GameDataManager : MonoBehaviour
                 waves[i].gameObject.SetActive(false);
 
             }
-
         }
 
         WeaponController.Instance.PlayerCtrl.Controller.enabled = false;
@@ -216,7 +241,6 @@ public class GameDataManager : MonoBehaviour
         }
         WeaponController.Instance.weaponType = saveGame.heldWeapon;
         WeaponController.Instance.SetActiveWeapon(saveGame.heldWeapon);
-        WeaponController.Instance.RefreshWeaponProperties();
 
         
         for (int i = 0; i < saveGame.waves.Length; i++)
@@ -237,15 +261,13 @@ public class GameDataManager : MonoBehaviour
             }
         }
         WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound = saveGame.zombiesKilledThisRound;
-
         WeaponController.Instance.PlayerCtrl.sceneIndex = saveGame.sceneIndex;
 
-        //waves[1].gameObject.SetActive(false);
-        //waves[2].gameObject.SetActive(false);
-        
-        
+        WeaponController.Instance.PlayerCtrl.Health = saveGame.health;
+        WeaponController.Instance.PlayerCtrl.Armour = saveGame.armour;
 
-        //Debug.Log(WeaponController.Instance.transform.position.ToString());
+        WeaponController.Instance.RefreshWeaponProperties();
+
     }
     private void Update()
     {

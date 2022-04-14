@@ -118,6 +118,7 @@ public class MenuController : MonoBehaviour
                 instructionsCanvas.gameObject.SetActive(false);
                 pauseCanvas.gameObject.SetActive(false);
                 Time.timeScale = 1f;
+                GameDataManager.Instance.Reset();
 
                 break;
             case Action.LoadGame:

@@ -1,22 +1,24 @@
 {
     "playerPos": {
-        "x": 12.587392807006836,
+        "x": 4.619499206542969,
         "y": 0.014999866485595703,
-        "z": 40.00719451904297
+        "z": 38.785953521728519
     },
     "playerRot": {
         "x": 0.0,
-        "y": -0.7384288907051086,
+        "y": 0.6293647289276123,
         "z": 0.0,
-        "w": -0.6743313670158386
+        "w": 0.7771100401878357
     },
+    "health": 85.0,
+    "armour": 40.0,
     "weapons": [
         {
             "name": "AK47",
             "loopFire": true,
             "fireRate": 0.10000000149011612,
             "ammoCount": 30,
-            "ammoTotal": 90,
+            "ammoTotal": 21,
             "startingMagSize": 30,
             "damage": 15.0
         },
@@ -33,18 +35,18 @@
             "name": "Rifle",
             "loopFire": false,
             "fireRate": 0.0,
-            "ammoCount": 1,
-            "ammoTotal": 0,
+            "ammoCount": 8,
+            "ammoTotal": 64,
             "startingMagSize": 8,
             "damage": 42.0
         }
     ],
-    "heldWeapon": 2,
+    "heldWeapon": 0,
     "waves": [
         {
             "zombies": [],
             "level": 1,
-            "waveIdx": 2
+            "waveIdx": 1
         },
         {
             "zombies": [],
