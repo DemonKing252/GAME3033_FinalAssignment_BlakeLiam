@@ -44,6 +44,31 @@ public class SQuat
 }
 
 [Serializable]
+public class STransform
+{
+    public SVector3 position;
+    public SQuat rotation;
+}
+
+[Serializable]
+public class SWeaponPickup : STransform
+{
+    public WeaponType weaponType;
+}
+[Serializable]
+public class SHealthPack : STransform
+{
+    public float regen;
+}
+[Serializable]
+public class SArmourPack : STransform
+{
+    public float regen;
+}
+
+
+
+[Serializable]
 public class SZombie
 {
     public SVector3 position;
@@ -80,6 +105,12 @@ public class SaveGameData
     public int hordeNumber = 1;
     public int zombiesKilledThisRound = 0;
     public int sceneIndex;
+
+    // Pickups
+    public List<SWeaponPickup> weaponPickups = new List<SWeaponPickup>();
+    public List<SHealthPack> healthPickups = new List<SHealthPack>();
+    public List<SArmourPack> armourPickups = new List<SArmourPack>();
+
 }
 
 
@@ -93,6 +124,10 @@ public class GameDataManager : MonoBehaviour
     public WaveSpawner[] waves;
     private static GameDataManager instance;
     public static GameDataManager Instance => instance;
+
+    public WeaponPickup weaponPickupPrefab;
+    public HealthPack healthPickupPrefab;
+    public ArmourPack armourPickupPrefab;
 
     void Awake()
     {
@@ -121,6 +156,9 @@ public class GameDataManager : MonoBehaviour
             saveGame.waves[i].zombies.Clear();
         }
 
+        saveGame.weaponPickups.Clear();
+        saveGame.healthPickups.Clear();
+        saveGame.armourPickups.Clear();
         saveGame.weapons.Clear();
 
         saveGame.playerPos = new SVector3(WeaponController.Instance.transform.position);
@@ -156,6 +194,36 @@ public class GameDataManager : MonoBehaviour
 
         saveGame.zombiesKilledThisRound = WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound;
         saveGame.sceneIndex = WeaponController.Instance.PlayerCtrl.sceneIndex;
+
+
+        PlayerController pController = WeaponController.Instance.PlayerCtrl;
+
+        for (int i = 0; i < pController.WeaponPickup.Count; i++)
+        {
+            SWeaponPickup weapon = new SWeaponPickup();
+            weapon.position = new SVector3(pController.WeaponPickup[i].transform.position);
+            weapon.rotation = new SQuat(pController.WeaponPickup[i].transform.rotation);
+            weapon.weaponType = pController.WeaponPickup[i].weaponType;
+            saveGame.weaponPickups.Add(weapon);
+        }
+
+        for (int i = 0; i < pController.HealthPacks.Count; i++)
+        {
+            SHealthPack health = new SHealthPack();
+            health.position = new SVector3(pController.HealthPacks[i].transform.position);
+            health.rotation = new SQuat(pController.HealthPacks[i].transform.rotation);
+            health.regen = pController.HealthPacks[i].HealthRegen;
+            saveGame.healthPickups.Add(health);
+        }
+        for (int i = 0; i < pController.ArmourPack.Count; i++)
+        {
+            SArmourPack armour = new SArmourPack();
+            armour.position = new SVector3(pController.ArmourPack[i].transform.position);
+            armour.rotation = new SQuat(pController.ArmourPack[i].transform.rotation);
+            armour.regen = pController.ArmourPack[i].ArmourRegen;
+            saveGame.armourPickups.Add(armour);
+        }
+
         string data = JsonUtility.ToJson(saveGame, true);
         StreamWriter sw = new StreamWriter(path);
         sw.Write(data);
@@ -190,7 +258,9 @@ public class GameDataManager : MonoBehaviour
         // wait one frame, give everything in the scene a chance to load in.
         yield return null;
 
-
+        PlayerController p = WeaponController.Instance.PlayerCtrl;
+        // ------------------------------
+        // Clear all weapons from save game instance, and re add them (no duplicates!)
         saveGame.weapons.Clear();
         for (int i = 0; i < saveGame.waves.Length; i++)
         {
@@ -207,11 +277,49 @@ public class GameDataManager : MonoBehaviour
         {
             waves[i].Zombies.Clear();
         }
+        //Debug.Log("armour count: " + p.ArmourPack.Count);
+        //yield return new WaitForSeconds(10f);
+
+        for (int i = 0; i < p.WeaponPickup.Count; i++)
+        {
+            Destroy(p.WeaponPickup[i].gameObject);
+        }
+
+        for (int i = 0; i < p.HealthPacks.Count; i++)
+        {
+            Destroy(p.HealthPacks[i].gameObject);
+        }
+
+        for (int i = 0; i < p.HealthPacks.Count; i++)
+        {
+            Destroy(p.HealthPacks[i].gameObject);
+        }
+        //count = FindObjectsOfType<ArmourPack>().Length;
+        //Debug.Log("armour count " + count);
+        //Debug.Log("destroyed objects");
+        //yield return new WaitForSeconds(20f);
+
+        p.WeaponPickup.Clear();
+        p.ArmourPack.Clear();
+        p.HealthPacks.Clear();
+
+        //Debug.Log("cleared pickups from scene");
+        //yield return new WaitForSeconds(20f);
+
+        saveGame.weaponPickups.Clear();
+        saveGame.healthPickups.Clear();
+        saveGame.armourPickups.Clear();
+
+
+        yield return null;
+        p = WeaponController.Instance.PlayerCtrl;
+
         StreamReader sr = new StreamReader(path);
         string raw = sr.ReadToEnd();
         saveGame = JsonUtility.FromJson<SaveGameData>(raw);
-        sr.Close(); 
-        
+        sr.Close();
+
+
         for (int i = 0; i < 3; i++)
         {
             if (i == saveGame.sceneIndex)
@@ -227,12 +335,9 @@ public class GameDataManager : MonoBehaviour
         }
 
         WeaponController.Instance.PlayerCtrl.Controller.enabled = false;
-
         WeaponController.Instance.transform.position = saveGame.playerPos.ToVector();
         WeaponController.Instance.transform.rotation = saveGame.playerRot.ToQuat();
         WeaponController.Instance.PlayerCtrl.Controller.enabled = true;
-
-        //WeaponController.Instance.EquippedWeapon.GetComponent<WeaponProperties>().weapon = saveGame.weapon;
 
         Assert.IsTrue(WeaponController.Instance.GetAllWeapons.Count == saveGame.weapons.Count, "Weapon size() doesn't match!");
         for (int i = 0; i < WeaponController.Instance.GetAllWeapons.Count; i++)
@@ -241,13 +346,11 @@ public class GameDataManager : MonoBehaviour
         }
         WeaponController.Instance.weaponType = saveGame.heldWeapon;
         WeaponController.Instance.SetActiveWeapon(saveGame.heldWeapon);
-
         
         for (int i = 0; i < saveGame.waves.Length; i++)
         {
             waves[i].Level = saveGame.waves[i].level;
-            waves[i].waveIndex = saveGame.waves[i].waveIdx;
-            
+            waves[i].waveIndex = saveGame.waves[i].waveIdx;            
         }        
 
         for (int j = 0; j < waves.Length; j++)
@@ -262,11 +365,36 @@ public class GameDataManager : MonoBehaviour
         }
         WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound = saveGame.zombiesKilledThisRound;
         WeaponController.Instance.PlayerCtrl.sceneIndex = saveGame.sceneIndex;
-
         WeaponController.Instance.PlayerCtrl.Health = saveGame.health;
         WeaponController.Instance.PlayerCtrl.Armour = saveGame.armour;
-
         WeaponController.Instance.RefreshWeaponProperties();
+
+        for (int i = 0; i < saveGame.weaponPickups.Count; i++)
+        {
+            WeaponPickup weaponPickup = Instantiate(weaponPickupPrefab, saveGame.weaponPickups[i].position.ToVector(), saveGame.weaponPickups[i].rotation.ToQuat());
+            weaponPickup.weaponType = saveGame.weaponPickups[i].weaponType;
+            weaponPickup.SetWeaponEquipped(saveGame.weaponPickups[i].weaponType);
+
+            p.WeaponPickup.Add(weaponPickup);
+        }
+
+        //count = FindObjectsOfType<ArmourPack>().Length;
+        //Debug.Log(p.ArmourPack.Count + " - objects in scene: ::::: " + count.ToString() + ", objects in save game instance:" + saveGame.armourPickups.Count);
+
+        for (int i = 0; i < saveGame.healthPickups.Count; i++)
+        {
+            HealthPack health = Instantiate(healthPickupPrefab, saveGame.healthPickups[i].position.ToVector(), saveGame.healthPickups[i].rotation.ToQuat());
+            health.HealthRegen = saveGame.healthPickups[i].regen;
+            p.HealthPacks.Add(health);
+        }
+        for (int i = 0; i < saveGame.armourPickups.Count; i++)
+        {
+            ArmourPack armour = Instantiate(armourPickupPrefab, saveGame.armourPickups[i].position.ToVector(), saveGame.armourPickups[i].rotation.ToQuat());
+            armour.ArmourRegen = saveGame.armourPickups[i].regen;
+            p.ArmourPack.Add(armour);
+        }
+        //count = FindObjectsOfType<ArmourPack>().Length;
+        //Debug.Log(p.ArmourPack.Count + " - objects in scene: ::::: " + count.ToString() + ", objects in save game instance:" + saveGame.armourPickups.Count);
 
     }
     private void Update()
@@ -279,7 +407,5 @@ public class GameDataManager : MonoBehaviour
         {
             LoadGame();
         }
-        //p.position = new Vector3(0f, 100f, 0f);
-        //Debug.Log(p.position);
     }
 }

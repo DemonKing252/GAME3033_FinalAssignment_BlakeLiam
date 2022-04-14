@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class HealthPack : MonoBehaviour
 {
+    [SerializeField]
+    private float healthRegen = 25f;
+
+    public float HealthRegen { get { return healthRegen; } set { healthRegen = value; } }
+
     // Start is called before the first frame update
     public void Start()
     {
@@ -19,7 +24,9 @@ public class HealthPack : MonoBehaviour
         {
             if (other.GetComponent<PlayerController>().Health < 100f)
             {
-                other.GetComponent<PlayerController>().Health += 25f;
+                other.GetComponent<PlayerController>().Health += healthRegen;
+                PlayerController player = WeaponController.Instance.PlayerCtrl;
+                player.HealthPacks.Remove(this);
                 Destroy(gameObject);
             }
         }

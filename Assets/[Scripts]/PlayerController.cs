@@ -60,6 +60,17 @@ public class PlayerController : MonoBehaviour
     private Quaternion originalRotation;
 
     [SerializeField] private Transform rightHandTransform;
+    
+
+    // Pickup fields
+    [SerializeField] private List<HealthPack> healthPacks;
+    [SerializeField] private List<ArmourPack> armourPacks;
+    [SerializeField] private List<WeaponPickup> weaponPickups;
+
+    // Pickup proerties
+    public List<HealthPack> HealthPacks => healthPacks;
+    public List<ArmourPack> ArmourPack => armourPacks;
+    public List<WeaponPickup> WeaponPickup => weaponPickups;
 
     private Vector3 vel = Vector3.zero;
 
@@ -86,6 +97,16 @@ public class PlayerController : MonoBehaviour
         originalRotation = boneTransform.rotation;
         onAimStateChanged.Invoke(false);
         RefreshUI();
+
+        foreach (WeaponPickup w in FindObjectsOfType<WeaponPickup>())
+            weaponPickups.Add(w);
+
+        foreach (ArmourPack a in FindObjectsOfType<ArmourPack>())
+            armourPacks.Add(a);
+        
+        foreach (HealthPack h in FindObjectsOfType<HealthPack>())
+            healthPacks.Add(h);
+
     }
     private void RefreshUI()
     {

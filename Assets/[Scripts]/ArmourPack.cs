@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class ArmourPack : MonoBehaviour
 {
+    [SerializeField]
+    private float armourRegen = 25f;
+
+    public float ArmourRegen { get { return armourRegen; } set { armourRegen = value; } }
     public void Start()
     {
     }
@@ -18,7 +22,9 @@ public class ArmourPack : MonoBehaviour
         {
             if (other.GetComponent<PlayerController>().Armour < 100f)
             {
-                other.GetComponent<PlayerController>().Armour += 25f;
+                other.GetComponent<PlayerController>().Armour += armourRegen;
+                PlayerController player = WeaponController.Instance.PlayerCtrl;
+                player.ArmourPack.Remove(this);
                 Destroy(gameObject);
             }
         }

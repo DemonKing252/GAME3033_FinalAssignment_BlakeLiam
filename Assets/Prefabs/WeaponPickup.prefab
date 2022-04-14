@@ -652,7 +652,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7903114399742913422, guid: 699d4d9d3f33a92419a3dbbcc2bf57ee, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.982
+      value: 0.019
       objectReference: {fileID: 0}
     - target: {fileID: 7903114399742913422, guid: 699d4d9d3f33a92419a3dbbcc2bf57ee, type: 3}
       propertyPath: m_LocalPosition.z
@@ -690,7 +690,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: rifle
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -3851167423305304946, guid: 699d4d9d3f33a92419a3dbbcc2bf57ee, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 699d4d9d3f33a92419a3dbbcc2bf57ee, type: 3}
 --- !u!1 &4268694147870085345 stripped
 GameObject:
