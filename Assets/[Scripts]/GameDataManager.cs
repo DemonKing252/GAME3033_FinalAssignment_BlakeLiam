@@ -254,7 +254,7 @@ public class GameDataManager : MonoBehaviour
     }
     private IEnumerator Delay()
     {
-
+        int count;
         // wait one frame, give everything in the scene a chance to load in.
         yield return null;
 
@@ -277,8 +277,9 @@ public class GameDataManager : MonoBehaviour
         {
             waves[i].Zombies.Clear();
         }
-        //Debug.Log("armour count: " + p.ArmourPack.Count);
-        //yield return new WaitForSeconds(10f);
+        count = FindObjectsOfType<ArmourPack>().Length;
+        //Debug.Log("armours in list: " + p.ArmourPack.Count + ", armours in scene: " + count.ToString() + ", objects in save game instance:" + saveGame.armourPickups.Count);
+
 
         for (int i = 0; i < p.WeaponPickup.Count; i++)
         {
@@ -290,21 +291,14 @@ public class GameDataManager : MonoBehaviour
             Destroy(p.HealthPacks[i].gameObject);
         }
 
-        for (int i = 0; i < p.HealthPacks.Count; i++)
+        for (int i = 0; i < p.ArmourPack.Count; i++)
         {
-            Destroy(p.HealthPacks[i].gameObject);
+            Destroy(p.ArmourPack[i].gameObject);
         }
-        //count = FindObjectsOfType<ArmourPack>().Length;
-        //Debug.Log("armour count " + count);
-        //Debug.Log("destroyed objects");
-        //yield return new WaitForSeconds(20f);
 
         p.WeaponPickup.Clear();
         p.ArmourPack.Clear();
         p.HealthPacks.Clear();
-
-        //Debug.Log("cleared pickups from scene");
-        //yield return new WaitForSeconds(20f);
 
         saveGame.weaponPickups.Clear();
         saveGame.healthPickups.Clear();
@@ -312,6 +306,10 @@ public class GameDataManager : MonoBehaviour
 
 
         yield return null;
+
+        count = FindObjectsOfType<ArmourPack>().Length;
+        //Debug.Log("armours in list: " + p.ArmourPack.Count + ", armours in scene: " + count.ToString() + ", objects in save game instance:" + saveGame.armourPickups.Count);
+
         p = WeaponController.Instance.PlayerCtrl;
 
         StreamReader sr = new StreamReader(path);
@@ -378,9 +376,7 @@ public class GameDataManager : MonoBehaviour
             p.WeaponPickup.Add(weaponPickup);
         }
 
-        //count = FindObjectsOfType<ArmourPack>().Length;
-        //Debug.Log(p.ArmourPack.Count + " - objects in scene: ::::: " + count.ToString() + ", objects in save game instance:" + saveGame.armourPickups.Count);
-
+        count = FindObjectsOfType<ArmourPack>().Length;
         for (int i = 0; i < saveGame.healthPickups.Count; i++)
         {
             HealthPack health = Instantiate(healthPickupPrefab, saveGame.healthPickups[i].position.ToVector(), saveGame.healthPickups[i].rotation.ToQuat());
@@ -393,9 +389,8 @@ public class GameDataManager : MonoBehaviour
             armour.ArmourRegen = saveGame.armourPickups[i].regen;
             p.ArmourPack.Add(armour);
         }
-        //count = FindObjectsOfType<ArmourPack>().Length;
-        //Debug.Log(p.ArmourPack.Count + " - objects in scene: ::::: " + count.ToString() + ", objects in save game instance:" + saveGame.armourPickups.Count);
 
+        count = FindObjectsOfType<ArmourPack>().Length;
     }
     private void Update()
     {
