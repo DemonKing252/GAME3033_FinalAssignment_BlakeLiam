@@ -55,6 +55,7 @@ public class ZombieController : MonoBehaviour
             Destroy(collision.gameObject);
 
             currentHealth -= WeaponController.Instance.EquippedWeapon.GetComponent<WeaponProperties>().weapon.damage;
+            AudioManager.Instance.PlaySound(Sfx.Hit);
             if (currentHealth <= 0f)
             {
                 capsuleCollider.enabled = false;

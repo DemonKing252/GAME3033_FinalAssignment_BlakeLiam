@@ -27,6 +27,7 @@ public class HealthPack : MonoBehaviour
                 other.GetComponent<PlayerController>().Health += healthRegen;
                 PlayerController player = WeaponController.Instance.PlayerCtrl;
                 player.HealthPacks.Remove(this);
+                AudioManager.Instance.PlaySound(Sfx.Pickup);
                 Destroy(gameObject);
             }
         }

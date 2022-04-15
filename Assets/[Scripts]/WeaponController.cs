@@ -163,6 +163,7 @@ public class WeaponController : MonoBehaviour
     IEnumerator OnReload()
     {
 
+        AudioManager.Instance.PlaySound(Sfx.Reload, false, 1f);
         pController.anim.SetTrigger("IsReloading");
 
         int ammoDifference = equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.startingMagSize - equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount;
@@ -195,6 +196,7 @@ public class WeaponController : MonoBehaviour
     }
     public void OnFire()
     {
+        AudioManager.Instance.PlaySound(Sfx.Fire);
         equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount--;
         ammoText.text = equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount.ToString() + " / " + equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal.ToString();
 

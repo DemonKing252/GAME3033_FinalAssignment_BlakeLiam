@@ -67,6 +67,8 @@ public class MenuController : MonoBehaviour
 
     public void OnAction(int action)
     {
+        AudioManager.Instance.PlaySound(Sfx.BtnClick);
+
         switch ((Action)action)
         {
             case Action.Quit:
@@ -181,7 +183,6 @@ public class MenuController : MonoBehaviour
 
                 break;
         }
-
     }
     private void LoadGame()
     {

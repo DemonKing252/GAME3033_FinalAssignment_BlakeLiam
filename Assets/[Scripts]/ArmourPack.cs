@@ -25,6 +25,7 @@ public class ArmourPack : MonoBehaviour
                 other.GetComponent<PlayerController>().Armour += armourRegen;
                 PlayerController player = WeaponController.Instance.PlayerCtrl;
                 player.ArmourPack.Remove(this);
+                AudioManager.Instance.PlaySound(Sfx.Pickup);
                 Destroy(gameObject);
             }
         }
