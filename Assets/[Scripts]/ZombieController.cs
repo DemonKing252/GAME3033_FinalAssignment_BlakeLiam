@@ -18,6 +18,9 @@ public class ZombieController : MonoBehaviour
     public WaveSpawner[] waveSpawners;
     public bool isAttacking;
 
+    private AgentSpeed speed;
+    public AgentSpeed Speed => speed;
+
     public void Seek(Transform transf, AgentSpeed speed, float health)
     {
         playerTransform = transf;
@@ -28,7 +31,7 @@ public class ZombieController : MonoBehaviour
             AgentSpeed.Walk => 0.6f,
             AgentSpeed.Sprint => 1.8f,        
         };
-
+        this.speed = speed;
     }
 
     private void Awake()
@@ -56,8 +59,20 @@ public class ZombieController : MonoBehaviour
             currentHealth -= WeaponController.Instance.EquippedWeapon.GetComponent<WeaponProperties>().weapon.damage;
             AudioManager.Instance.PlaySound(Sfx.Hit);
             collision.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            collision.transform.GetComponentInChildren<ParticleSystem>().Play();
-            Destroy(collision.gameObject, 4f);
+
+            try
+            {
+                if (collision.transform.GetComponentInChildren<ParticleSystem>() != null)
+                {
+                    collision.transform.GetComponentInChildren<ParticleSystem>().Play();
+                    Destroy(collision.gameObject, 4f);
+                }
+            }
+            catch
+            {
+                // were okay.
+            }
+
             if (currentHealth <= 0f)
             {
                 capsuleCollider.enabled = false;

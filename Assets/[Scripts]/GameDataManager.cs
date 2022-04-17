@@ -75,6 +75,7 @@ public class SZombie
     public SQuat rotation;
     public int waveIndex;
     public float currentHealth;
+    public AgentSpeed agentSpeed;
 }
 
 
@@ -185,6 +186,7 @@ public class GameDataManager : MonoBehaviour
                 zombie.rotation = new SQuat(z.transform.rotation);
                 zombie.waveIndex = z.waveIndex;
                 zombie.currentHealth = z.CurrentHealth;
+                zombie.agentSpeed = z.Speed;
 
                 saveGame.waves[i].zombies.Add(zombie);
             }
@@ -357,7 +359,7 @@ public class GameDataManager : MonoBehaviour
             {
                 ZombieController zombie = Instantiate(waves[j].zombiePrefab, saveGame.waves[j].zombies[i].position.ToVector(), saveGame.waves[j].zombies[i].rotation.ToQuat());
                 zombie.waveIndex = saveGame.waves[j].zombies[i].waveIndex;
-                zombie.Seek(WeaponController.Instance.transform, AgentSpeed.Walk, saveGame.waves[j].zombies[i].currentHealth);
+                zombie.Seek(WeaponController.Instance.transform, saveGame.waves[j].zombies[i].agentSpeed, saveGame.waves[j].zombies[i].currentHealth);
                 waves[j].AddZombie(zombie);
             }
         }
