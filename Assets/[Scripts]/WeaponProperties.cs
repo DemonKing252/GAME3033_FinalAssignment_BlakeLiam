@@ -7,8 +7,25 @@ public class WeaponProperties : MonoBehaviour
     public Transform gripIKTransform;
     public Transform muzzleFront;
     public Transform muzzleBack;
+    public GameObject muzzleFlashPrefab;
 
     public Weapon weapon;
+
+    public Vector3 desiredParticleScale = Vector3.one;
+    public float awakeTime = 0.2f;
+
+    public IEnumerator SpawnMuzzleFlash()
+    {
+        GameObject go = Instantiate(muzzleFlashPrefab, muzzleBack);
+        go.transform.localScale = desiredParticleScale;
+        go.GetComponent<ParticleSystem>().Play();
+        go.transform.localPosition = Vector3.zero;
+
+        yield return new WaitForSeconds(awakeTime);
+
+        Destroy(go);
+    }
+
 }
 [System.Serializable]
 public class Weapon

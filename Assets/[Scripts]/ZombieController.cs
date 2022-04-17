@@ -52,10 +52,12 @@ public class ZombieController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Bullet"))
         {
-            Destroy(collision.gameObject);
 
             currentHealth -= WeaponController.Instance.EquippedWeapon.GetComponent<WeaponProperties>().weapon.damage;
             AudioManager.Instance.PlaySound(Sfx.Hit);
+            collision.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            collision.transform.GetComponentInChildren<ParticleSystem>().Play();
+            Destroy(collision.gameObject, 4f);
             if (currentHealth <= 0f)
             {
                 capsuleCollider.enabled = false;

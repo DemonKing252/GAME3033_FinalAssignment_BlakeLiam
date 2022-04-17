@@ -51,6 +51,7 @@ MonoBehaviour:
   gripIKTransform: {fileID: 2484002700243643546}
   muzzleFront: {fileID: 8705772629342323872}
   muzzleBack: {fileID: 685155005673438414}
+  muzzleFlashPrefab: {fileID: 1999325975994387065, guid: 41e1572ad41de984a858ed0632d2c80d, type: 3}
   weapon:
     name: AK47
     loopFire: 1
@@ -59,6 +60,8 @@ MonoBehaviour:
     ammoTotal: 90
     startingMagSize: 30
     damage: 15
+  desiredParticleScale: {x: 15, y: 15, z: 15}
+  awakeTime: 0.2
 --- !u!1 &2223628641388421640
 GameObject:
   m_ObjectHideFlags: 0

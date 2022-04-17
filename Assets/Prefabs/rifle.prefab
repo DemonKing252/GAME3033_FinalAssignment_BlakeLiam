@@ -324,6 +324,7 @@ MonoBehaviour:
   gripIKTransform: {fileID: 1312791375420048752}
   muzzleFront: {fileID: 1477074113308327055}
   muzzleBack: {fileID: 1582102370097477170}
+  muzzleFlashPrefab: {fileID: 1999325975994387065, guid: 41e1572ad41de984a858ed0632d2c80d, type: 3}
   weapon:
     name: Rifle
     loopFire: 0
@@ -332,6 +333,7 @@ MonoBehaviour:
     ammoTotal: 64
     startingMagSize: 8
     damage: 42
+  desiredParticleScale: {x: 15, y: 15, z: 15}
 --- !u!1 &8350200049739280360
 GameObject:
   m_ObjectHideFlags: 0

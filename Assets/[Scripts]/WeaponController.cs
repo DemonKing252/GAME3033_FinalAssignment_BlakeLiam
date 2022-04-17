@@ -200,6 +200,8 @@ public class WeaponController : MonoBehaviour
         equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount--;
         ammoText.text = equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoCount.ToString() + " / " + equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().weapon.ammoTotal.ToString();
 
+        StartCoroutine(equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().SpawnMuzzleFlash());
+
         GameObject bullet = Instantiate(bulletPrefab);
         pController.anim.SetTrigger("IsFiring");
         Vector3 dir = GetCrossHairWorldPoint() - equippedWeapons[(int)weaponType].GetComponent<WeaponProperties>().muzzleBack.position;
