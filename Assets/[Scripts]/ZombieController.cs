@@ -15,14 +15,18 @@ public class ZombieController : MonoBehaviour
     public float CurrentHealth { get { return currentHealth; } set { currentHealth = value; } }
 
     public int waveIndex = 0;
-    public WaveSpawner[] waveSpawners;
+    //public WaveSpawner[] waveSpawners;
     public bool isAttacking;
 
     private AgentSpeed speed;
     public AgentSpeed Speed => speed;
 
-    public void Seek(Transform transf, AgentSpeed speed, float health)
+    private WaveSpawner waveSpawner = null;
+    public WaveSpawner WaveSpawner => waveSpawner;
+
+    public void Seek(Transform transf, AgentSpeed speed, float health, WaveSpawner waveSpawner)
     {
+        this.waveSpawner = waveSpawner;
         playerTransform = transf;
         currentHealth = health;
 
@@ -44,7 +48,7 @@ public class ZombieController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        waveSpawners = FindObjectsOfType<WaveSpawner>();
+        //waveSpawners = FindObjectsOfType<WaveSpawner>();
     }
 
     void FixedUpdate()
@@ -75,17 +79,19 @@ public class ZombieController : MonoBehaviour
 
             if (currentHealth <= 0f)
             {
+                waveSpawner.Zombies.Remove(this);
+                waveSpawner.kills++;
+
                 capsuleCollider.enabled = false;
                 agent.isStopped = true;
                 zombieAnimator.SetTrigger("Death");
-                WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound++;
                 Destroy(gameObject, 5f);
             }
         }
     }
     private void OnDestroy()
     {
-        waveSpawners[waveIndex].OnZombieKilled(this);
+        //waveSpawners[waveIndex].OnZombieKilled(this);
     }
 
     // Update is called once per frame

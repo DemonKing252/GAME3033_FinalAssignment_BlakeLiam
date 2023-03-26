@@ -59,24 +59,21 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
     [SerializeField] private MonoBehaviour[] levelCompleteListeners;
     [SerializeField] private int level = 1;
 
+    [SerializeField] private Gradient roundGradiant;
+    [SerializeField] private Gradient roundEndGradiant;
+    [SerializeField] private Gradient roundStartGradiant;
+
     public MonoBehaviour[] LevelCompleteListeners => levelCompleteListeners;
     public List<ZombieController> Zombies => zombiesInScene;
     public void AddZombie(ZombieController z) { zombiesInScene.Add(z); }
     public int Level { get { return level; } set { level = value; } }
 
+    public int kills = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        Invoke(nameof(Spawn), 2.5f);
-    }
-    public void Spawn()
-    {
         StartCoroutine(SpawnHorde());
-    }
-    public void CancelSpawn()
-    {
-        CancelInvoke(nameof(Spawn));
     }
     public void OnLevelCompleted(int level)
     {
@@ -87,73 +84,142 @@ public class WaveSpawner : MonoBehaviour, ILevelCompleteInterface
         // This object is the NEXT wave spawner that will get turned on
         gameObject.SetActive(true);
     }
-    public void OnZombieKilled(ZombieController zombie)
-    {
-        zombiesInScene.Remove(zombie);
-        zombiesLeftText.text = zombiesInScene.Count.ToString();
-    }
-    public void OnNextScene()
-    {   
-
-        foreach (ILevelCompleteInterface listener in LevelCompleteListeners)
-            listener.OnCloseDoors();
-        
-        // Were done with this spawner
-        gameObject.SetActive(false);
-    }
 
     public IEnumerator SpawnHorde()
     {
-        Debug.Log("Starting horde..");
-        yield return new WaitForSeconds(horde.spawnStartDelay);
-
-        if (waveIndex < horde.waves.Length)
+        
+        int round = 1;
+        while (true)
         {
-            do
+            // Next round
+            
+            if (round != 1)
             {
-                zombiesLeftText.text = horde.waves[waveIndex].numZombies.ToString();
-                currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
+                int previousRound = round - 1;
 
-                zombiesRemaining = (horde.waves[waveIndex].numZombies - zombiesInScene.Count) - WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound;
-                Debug.Log(zombiesRemaining);
-
-                while (zombiesRemaining > 0)
+                currentWaveText.text = previousRound.ToString();
+                float t = 0f;
+                // round transition
+                while (t < 5f)
                 {
-                    ZombieController zController = Instantiate(zombiePrefab, horde.GetRandomPointInSpawners(), Quaternion.identity);
-                    zController.Seek(playerTransform, horde.waves[waveIndex].agentSpeed, horde.waves[waveIndex].health);
-
-
-                    zombiesInScene.Add(zController);
-
-                    zombiesRemaining--;
-
-                    yield return new WaitForSeconds(horde.waves[waveIndex].delayBetweenSpawns);
-                }
-
-                // Wait indefinately until the player kills all of the zombies, then start the next wave.
-                while (zombiesInScene.Count != 0)
-                {
+                    currentWaveText.color = roundGradiant.Evaluate(t % 1.0f);
+                    t += Time.deltaTime;
                     yield return null;
                 }
-                WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound = 0;
-                yield return new WaitForSeconds(horde.delayToNextWave);
 
-                waveIndex++;
-                if (waveIndex <= horde.waves.Length - 1)
-                    currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
+                // round end
+                t = 0f;
+                while (t < 1f)
+                {
+                    currentWaveText.color = roundEndGradiant.Evaluate(t);
+                    t += Time.deltaTime;
+                    yield return null;
+                }
 
-            } while (waveIndex < horde.waves.Length);
+                yield return new WaitForSeconds(2f);
+                currentWaveText.text = round.ToString();
 
-            foreach (ILevelCompleteInterface listener in levelCompleteListeners)
-                listener.OnLevelCompleted(level);
+                // round startup
+                t = 0f;
+                while (t < 2f)
+                {
+                    currentWaveText.color = roundStartGradiant.Evaluate(t/2f);
+                    t += Time.deltaTime;
+                    yield return null;
+                }
+
+            }
+            else
+                currentWaveText.text = round.ToString();
+            
+            
+            float temp = 0;
+            for (int i = 1; i <= round; i++)
+            {
+                if (i < 5)
+                    temp += 4f;
+                else if (i < 10)
+                    temp += 12f;
+                else
+                    temp *= 1.01f;
+
+            }
+            int totalZombies = (int)temp;
+            Debug.Log("total zombies should be: " + totalZombies);
+            kills = 0;
+            while (kills < totalZombies)
+            {
+                /* Actions
+                   -------
+                1. If zombie count is less then total kills
+                
+                */
+                
+                if (zombiesInScene.Count < 10 && (zombiesInScene.Count + kills) < totalZombies)
+                {
+                    var zombie = Instantiate(zombiePrefab, horde.GetRandomPointInSpawners(), Quaternion.identity);
+                    zombie.Seek(playerTransform, AgentSpeed.Walk, 100f, this);
+                    zombiesInScene.Add(zombie);
+                    zombiesLeftText.text = kills.ToString() + "/" + totalZombies.ToString();
+                }
+
+                yield return new WaitForSeconds(5f);
+            }
+            Debug.Log("Ending round: " + round);
+            yield return new WaitForSeconds(3f);
+            round = 163;
         }
-        else
-        {
 
-            foreach (ILevelCompleteInterface listener in levelCompleteListeners)
-                listener.OnLevelCompleted(level);
-        }
-        
+
+        //yield return new WaitForSeconds(horde.spawnStartDelay);
+        //
+        //if (waveIndex < horde.waves.Length)
+        //{
+        //    do
+        //    {
+        //        zombiesLeftText.text = horde.waves[waveIndex].numZombies.ToString();
+        //        currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
+        //
+        //        zombiesRemaining = (horde.waves[waveIndex].numZombies - zombiesInScene.Count) - WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound;
+        //        Debug.Log(zombiesRemaining);
+        //
+        //        while (zombiesRemaining > 0)
+        //        {
+        //            ZombieController zController = Instantiate(zombiePrefab, horde.GetRandomPointInSpawners(), Quaternion.identity);
+        //            zController.Seek(playerTransform, horde.waves[waveIndex].agentSpeed, horde.waves[waveIndex].health);
+        //
+        //
+        //            zombiesInScene.Add(zController);
+        //
+        //            zombiesRemaining--;
+        //
+        //            yield return new WaitForSeconds(horde.waves[waveIndex].delayBetweenSpawns);
+        //        }
+        //
+        //        // Wait indefinately until the player kills all of the zombies, then start the next wave.
+        //        while (zombiesInScene.Count != 0)
+        //        {
+        //            yield return null;
+        //        }
+        //        WeaponController.Instance.PlayerCtrl.zombiesKilledThisRound = 0;
+        //        yield return new WaitForSeconds(horde.delayToNextWave);
+        //
+        //        waveIndex++;
+        //        if (waveIndex <= horde.waves.Length - 1)
+        //            currentWaveText.text = (waveIndex + 1).ToString() + " / " + horde.waves.Length.ToString();
+        //
+        //    } while (waveIndex < horde.waves.Length);
+        //
+        //    foreach (ILevelCompleteInterface listener in levelCompleteListeners)
+        //        listener.OnLevelCompleted(level);
+        //}
+        //else
+        //{
+        //
+        //    foreach (ILevelCompleteInterface listener in levelCompleteListeners)
+        //        listener.OnLevelCompleted(level);
+        //}
+
 
     }
 

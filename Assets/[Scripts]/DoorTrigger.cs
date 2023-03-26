@@ -13,7 +13,7 @@ public class DoorTrigger : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             other.transform.GetComponent<PlayerController>().sceneIndex = sceneIndex;
-            waveSpawner.OnNextScene();
+            //waveSpawner.OnNextScene();
             Destroy(gameObject);
         }
     }
